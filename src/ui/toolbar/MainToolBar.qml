@@ -32,6 +32,7 @@ Rectangle {
     signal showPlanView
     signal showFlyView
     signal showAnalyzeView
+    signal showDataView //Added by Deddy Welsan
     signal armVehicle
     signal disarmVehicle
     signal vtolTransitionToFwdFlight
@@ -55,6 +56,10 @@ Rectangle {
 
     function checkAnalyzeButton() {
         analyzeButton.checked = true
+    }
+    //Added by Deddy Welsan
+    function checkDataButton() {
+        dataButton.checked = true
     }
 
     Component.onCompleted: {
@@ -135,6 +140,16 @@ Rectangle {
                 visible:            !ScreenTools.isMobile && QGroundControl.corePlugin.showAdvancedUI
                 onClicked:          toolBar.showAnalyzeView()
             }
+
+            //Added by Deddy
+            QGCToolBarButton {
+                id:                 dataButton
+                anchors.top:        parent.top
+                anchors.bottom:     parent.bottom
+                exclusiveGroup:     mainActionGroup
+                source:             "/qmlimages/Analyze.svg"
+                onClicked:          toolBar.showDataView()
+            } //ends here
 
             Rectangle {
                 anchors.margins:    ScreenTools.defaultFontPixelHeight / 2

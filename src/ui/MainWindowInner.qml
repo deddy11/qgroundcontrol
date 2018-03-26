@@ -33,12 +33,13 @@ Item {
     property var    activeVehicle:      QGroundControl.multiVehicleManager.activeVehicle
     property string formatedMessage:    activeVehicle ? activeVehicle.formatedMessage : ""
 
-    property var _viewList: [ settingsViewLoader, setupViewLoader, planViewLoader, flightView, analyzeViewLoader ]
+    property var _viewList: [ settingsViewLoader, setupViewLoader, planViewLoader, flightView, analyzeViewLoader, dataViewLoader ]
 
     readonly property string _settingsViewSource:   "AppSettings.qml"
     readonly property string _setupViewSource:      "SetupView.qml"
     readonly property string _planViewSource:       "PlanView.qml"
     readonly property string _analyzeViewSource:    "AnalyzeView.qml"
+    readonly property string _dataViewSource:       "AppSettings.qml"   //Added by Deddy
 
     onHeightChanged: {
         //-- We only deal with the available height if within the Fly or Plan view
@@ -135,6 +136,22 @@ Item {
         analyzeViewLoader.visible = true
         toolBar.checkAnalyzeButton()
     }
+
+    //Added by Deddy
+    function showDataView() {
+        mainWindow.enableToolbar()
+        rootLoader.sourceComponent = null
+        if(currentPopUp) {
+            currentPopUp.close()
+        }
+        ScreenTools.availableHeight = 0
+        if (dataViewLoader.source  != _dataViewSource) {
+            dataViewLoader.source  = _dataViewSource
+        }
+        hideAllViews()
+        dataViewLoader.visible = true
+        toolBar.checkDataButton()
+    }//ends here
 
     /// Start the process of closing QGroundControl. Prompts the user are needed.
     function attemptWindowClose() {
@@ -284,6 +301,7 @@ Item {
         onShowPlanView:         mainWindow.showPlanView()
         onShowFlyView:          mainWindow.showFlyView()
         onShowAnalyzeView:      mainWindow.showAnalyzeView()
+        onShowDataView:         mainWindow.showDataView()       //Added by Deddy Welsan
         onArmVehicle:           flightView.guidedController.confirmAction(flightView.guidedController.actionArm)
         onDisarmVehicle: {
             if (flightView.guidedController.showEmergenyStop) {
@@ -296,10 +314,13 @@ Item {
         onVtolTransitionToMRFlight:     flightView.guidedController.confirmAction(flightView.guidedController.actionVtolTransitionToMRFlight)
 
         //-- Entire tool bar area disable on cammand
-        DeadMouseArea {
+        MouseArea {
             id:             toolbarBlocker
-            enabled:        false
             anchors.fill:   parent
+            enabled:        false
+            onWheel:        { wheel.accepted = true; }
+            onPressed:      { mouse.accepted = true; }
+            onReleased:     { mouse.accepted = true; }
         }
     }
 
@@ -373,6 +394,15 @@ Item {
         anchors.bottom:     parent.bottom
         visible:            false
     }
+    //Added by Deddy Welsan
+    Loader {
+        id:                 dataViewLoader
+        anchors.left:       parent.left
+        anchors.right:      parent.right
+        anchors.top:        toolBar.bottom
+        anchors.bottom:     parent.bottom
+        visible:            false
+    }//ends here
 
     //-------------------------------------------------------------------------
     //-- Dismiss Pop Up Messages
