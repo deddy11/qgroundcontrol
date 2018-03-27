@@ -239,6 +239,7 @@ Rectangle {
                 checked:            true
                 exclusiveGroup:     setupButtonGroup
                 text:               qsTr("Summary")
+                anchors.centerIn:   parent.Center
                 Layout.fillWidth:   true
 
                 onClicked: showSummaryPanel()

@@ -39,7 +39,7 @@ Item {
     readonly property string _setupViewSource:      "SetupView.qml"
     readonly property string _planViewSource:       "PlanView.qml"
     readonly property string _analyzeViewSource:    "AnalyzeView.qml"
-    readonly property string _dataViewSource:       "AppSettings.qml"   //Added by Deddy
+    readonly property string _dataViewSource:       "DataView.qml"   //Added by Deddy
 
     onHeightChanged: {
         //-- We only deal with the available height if within the Fly or Plan view
