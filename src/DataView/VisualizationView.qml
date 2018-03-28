@@ -27,10 +27,12 @@ import QGroundControl.Controllers   1.0
 
 /// Mission Editor
 
-QGCView {
-    id:         _qgcView
-    viewPanel:  panel
-    z:          QGroundControl.zOrderTopMost
+Rectangle {
+    id:             _summaryRoot
+    anchors.fill:   parent
+    anchors.rightMargin: ScreenTools.defaultFontPixelWidth
+    anchors.leftMargin:  ScreenTools.defaultFontPixelWidth
+    color:          qgcPal.window
 
     readonly property int   _decimalPlaces:             8
     readonly property real  _horizontalMargin:          ScreenTools.defaultFontPixelWidth  / 2
@@ -430,83 +432,47 @@ QGCView {
                 id:                 toolStrip
                 anchors.leftMargin: ScreenTools.defaultFontPixelWidth
                 anchors.left:       parent.left
-                anchors.topMargin:  _toolButtonTopMargin
+                anchors.topMargin:  ScreenTools.toolbarHeight + (_margins * 2)
                 anchors.top:        parent.top
                 color:              qgcPal.window
-                title:              qsTr("Plan")
+                title:              qsTr("Map")
                 z:                  QGroundControl.zOrderWidgets
-                showAlternateIcon:  [ false, false, false, masterController.dirty, false, false, false ]
-                rotateImage:        [ false, false, false, masterController.syncInProgress, false, false, false ]
-                animateImage:       [ false, false, false, masterController.dirty, false, false, false ]
-                buttonEnabled:      [ true, true, true, !masterController.syncInProgress, true, true, true ]
-                buttonVisible:      [ true, _waypointsOnlyMode, true, true, true, _showZoom, _showZoom ]
+                showAlternateIcon:  [ false, false ]
+                rotateImage:        [ false, false ]
+                animateImage:       [ false, false ]
+                buttonEnabled:      [ true, true ]
+                buttonVisible:      [ _showZoom, _showZoom ]
                 maxHeight:          mapScale.y - toolStrip.y
 
                 property bool _showZoom: !ScreenTools.isMobile
 
                 model: [
                     {
-                        name:       "Waypoint",
-                        iconSource: "/qmlimages/MapAddMission.svg",
-                        toggle:     true
-                    },
-                    {
-                        name:       "ROI",
-                        iconSource: "/qmlimages/MapAddMission.svg",
-                        toggle:     true
-                    },
-                    {
-                        name:               _singleComplexItem ? _missionController.complexMissionItemNames[0] : "Pattern",
-                        iconSource:         "/qmlimages/MapDrawShape.svg",
-                        dropPanelComponent: _singleComplexItem ? undefined : patternDropPanel
-                    },
-                    {
-                        name:                   "Sync",
-                        iconSource:             "/qmlimages/MapSync.svg",
-                        alternateIconSource:    "/qmlimages/MapSyncChanged.svg",
-                        dropPanelComponent:     syncDropPanel
-                    },
-                    {
-                        name:               "Center",
-                        iconSource:         "/qmlimages/MapCenter.svg",
-                        dropPanelComponent: centerMapDropPanel
-                    },
-                    {
-                        name:               "In",
-                        iconSource:         "/qmlimages/ZoomPlus.svg"
+                        name:       "In",
+                        iconSource: "/qmlimages/ZoomPlus.svg",
                     },
                     {
                         name:               "Out",
-                        iconSource:         "/qmlimages/ZoomMinus.svg"
+                        iconSource:         "/qmlimages/ZoomMinus.svg",
                     }
                 ]
 
                 onClicked: {
                     switch (index) {
                     case 0:
-                        _addWaypointOnClick = checked
-                        _addROIOnClick = false
+                        editorMap.zoomLevel += 1
                         break
                     case 1:
-                        _addROIOnClick = checked
-                        _addWaypointOnClick = false
-                        break
-                    case 2:
-                        if (_singleComplexItem) {
-                            addComplexItem(_missionController.complexMissionItemNames[0])
-                        }
-                        break
-                    case 5:
-                        editorMap.zoomLevel += 0.5
-                        break
-                    case 6:
-                        editorMap.zoomLevel -= 0.5
+                        editorMap.zoomLevel -= 1
                         break
                     }
                 }
             }
         } // FlightMap
 
+
+
+        /*
         // Right pane for mission editing controls
         Rectangle {
             id:                 rightPanel
@@ -516,11 +482,12 @@ QGCView {
             width:              _rightPanelWidth
             color:              qgcPal.window
             opacity:            0.2
-        }
+        }*/
 
         Item {
             anchors.fill:   rightPanel
 
+            /*
             // Plan Element selector (Mission/Fence/Rally)
             Row {
                 id:                 planElementSelectorRow
@@ -583,7 +550,7 @@ QGCView {
                 }
             } // Row - Plan Element Selector
 
-            /* Mission Item Editor
+            // Mission Item Editor
             Item {
                 id:                 missionItemEditor
                 anchors.topMargin:  ScreenTools.defaultFontPixelHeight / 2
@@ -860,4 +827,4 @@ QGCView {
             }
         }
     }
-} // QGCVIew
+}

@@ -10,7 +10,7 @@ import QGroundControl.Controllers   1.0
 import QGroundControl.ScreenTools   1.0
 
 Rectangle {
-    id:     setupView
+    id:     dataView
     color:  qgcPal.window
     z:      QGroundControl.zOrderTopMost
 
@@ -70,41 +70,31 @@ Rectangle {
                 visible:                !ScreenTools.isShortScreen
             }
 
-            Repeater {
-                id: buttonRepeater
+            QGCButton {
+                text:           qsTr("Visualization")
+                width:          _butttonWidth
+                exclusiveGroup: setupButtonGroup
+                onClicked:      panelLoader.source = "VisualizationView.qml"
+            }
 
-                model: ListModel {
-                    ListElement {
-                        buttonImage:        "/qmlimages/LogDownloadIcon"
-                        buttonText:         qsTr("Visualization")
-                        pageSource:         "VisualizationView.qml"
-                    }
-                    ListElement {
-                        buttonImage:        "/qmlimages/GeoTagIcon"
-                        buttonText:         qsTr("Table")
-                        pageSource:         "LogDownloadPage.qml"
-                    }
-                }
-
-                Component.onCompleted: itemAt(0).checked = true
-
-                QGCButton {
-                    text:           buttonText
-                    width:          _butttonWidth
-                    exclusiveGroup: setupButtonGroup
-                    onClicked:      panelLoader.source = pageSource
-                }
+            QGCButton {
+                text:           qsTr("Table")
+                width:          _butttonWidth
+                exclusiveGroup: setupButtonGroup
+                onClicked:      panelLoader.source = "LogDownloadPage.qml"
             }
 
             QGCButton {
                 text:           "Save Log"
                 width:          _butttonWidth
+                exclusiveGroup: setupButtonGroup
 //                onClicked:      panelLoader.source = pageSource
             }
 
             QGCButton {
                 text:           "Load Log"
                 width:          _butttonWidth
+                exclusiveGroup: setupButtonGroup
 //                onClicked:      panelLoader.source = pageSource
             }
         }
