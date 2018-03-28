@@ -391,6 +391,7 @@ QGCView {
                 }
             }
 
+            /*
             // Add lines between waypoints
             MissionLineView {
                 model: _editingLayer == _layerMission ? _missionController.waypointLines : undefined
@@ -423,6 +424,7 @@ QGCView {
                 interactive:            _editingLayer == _layerRallyPoints
                 planView:               true
             }
+            */
 
             ToolStrip {
                 id:                 toolStrip
@@ -581,7 +583,7 @@ QGCView {
                 }
             } // Row - Plan Element Selector
 
-            // Mission Item Editor
+            /* Mission Item Editor
             Item {
                 id:                 missionItemEditor
                 anchors.topMargin:  ScreenTools.defaultFontPixelHeight / 2
@@ -625,7 +627,7 @@ QGCView {
                         onInsertComplexItem:    insertComplexMissionItem(complexItemName, editorMap.center, index)
                     }
                 } // QGCListView
-            } // Item - Mission Item editor
+            } */ //Item - Mission Item editor
 
             // GeoFence Editor
             GeoFenceEditor {
@@ -672,6 +674,7 @@ QGCView {
             visible:            _toolStripBottom < y
         }
 
+        /*
         MissionItemStatus {
             id:                 waypointValuesDisplay
             anchors.margins:    ScreenTools.defaultFontPixelWidth
@@ -681,7 +684,7 @@ QGCView {
             anchors.bottom:     parent.bottom
             missionItems:       _missionController.visualItems
             visible:            _editingLayer === _layerMission && (_toolStripBottom + mapScale.height) < y && QGroundControl.corePlugin.options.showMissionStatus
-        }
+        }*/
     } // QGCViewPanel
 
     Component {

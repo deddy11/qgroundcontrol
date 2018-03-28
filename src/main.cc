@@ -26,6 +26,7 @@
 #include <QStringListModel>
 #include "QGCApplication.h"
 #include "AppMessages.h"
+#include <QNetworkProxy>
 
 #ifndef __mobile__
     #include "QGCSerialPortInfo.h"
@@ -211,6 +212,17 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_LINUX
     QApplication::setWindowIcon(QIcon(":/res/resources/icons/qgroundcontrol.ico"));
+
+    //This is added by Deddy to get proxy access
+    QNetworkProxy proxy;
+    proxy.setType(QNetworkProxy::HttpProxy);
+    proxy.setHostName("cache.itb.ac.id");
+    proxy.setPort(8080);
+    proxy.setUser("deddy11");
+    proxy.setPassword("10568173");
+    QNetworkProxy::setApplicationProxy(proxy);
+    //editing ends here
+
 #endif /* Q_OS_LINUX */
 
     // There appears to be a threading issue in qRegisterMetaType which can cause it to throw a qWarning
