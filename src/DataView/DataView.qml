@@ -81,7 +81,7 @@ Rectangle {
                 text:           qsTr("Table")
                 width:          _butttonWidth
                 exclusiveGroup: setupButtonGroup
-                onClicked:      panelLoader.source = "LogDownloadPage.qml"
+                onClicked:      panelLoader.source = "TableOfData.qml"
             }
 
             QGCButton {
