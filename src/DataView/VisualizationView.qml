@@ -392,8 +392,7 @@ Rectangle {
                     visible:    _editingLayer == _layerMission
                 }
             }
-
-            /*
+        /*
             // Add lines between waypoints
             MissionLineView {
                 model: _editingLayer == _layerMission ? _missionController.waypointLines : undefined
@@ -426,7 +425,7 @@ Rectangle {
                 interactive:            _editingLayer == _layerRallyPoints
                 planView:               true
             }
-            */
+           */
 
             ToolStrip {
                 id:                 toolStrip
@@ -470,24 +469,140 @@ Rectangle {
             }
         } // FlightMap
 
-
-
-        /*
         // Right pane for mission editing controls
         Rectangle {
             id:                 rightPanel
-            anchors.bottom:     parent.bottom
+            anchors.top:        parent.top
             anchors.right:      parent.right
-            height:             ScreenTools.availableHeight
+            height:             200
+            width:              _rightPanelWidth
+            color:              "white"
+            opacity:            0.5
+        }
+
+        Rectangle {
+            id: recInput
+            anchors.top:        parent.top
+            anchors.topMargin:  10
+            anchors.right:      parent.right
             width:              _rightPanelWidth
             color:              qgcPal.window
-            opacity:            0.2
-        }*/
 
+            Text {
+                id: textLat
+                anchors.verticalCenter: tfLat.verticalCenter
+                anchors.left: recInput.left
+                width: 108
+                height: 22
+                text: qsTr("Latitude")
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 12
+            }
+
+            Text {
+                id: textLong
+                anchors.verticalCenter: tfLong.verticalCenter
+                anchors.left: recInput.left
+                width: 108
+                height: 22
+                text: qsTr("Longitude")
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 12
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            Text {
+                id: textAlt
+                anchors.verticalCenter: tfAlt.verticalCenter
+                anchors.left: recInput.left
+                width: 108
+                height: 22
+                text: qsTr("Altitude")
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 12
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            TextField {
+                id: tfLat
+                anchors.top: rbChemical.bottom
+                anchors.topMargin: 5
+                anchors.left: textLat.right
+                width: 126
+                height: 30
+                font.pointSize: 11
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            TextField {
+                id: tfLong
+                anchors.top: tfLat.bottom
+                anchors.topMargin: 5
+                anchors.left: textLong.right
+                width: 126
+                height: 30
+                horizontalAlignment: Text.AlignHCenter
+                font.pointSize: 11
+            }
+
+            TextField {
+                id: tfAlt
+                anchors.top: tfLong.bottom
+                anchors.topMargin: 5
+                anchors.left: textAlt.right
+                width: 126
+                height: 30
+                horizontalAlignment: Text.AlignHCenter
+                font.pointSize: 11
+            }
+
+            RadioButton {
+                id: rbUAV
+                anchors.top: recInput.top
+                anchors.topMargin: 10
+                anchors.left: recInput.left
+                anchors.leftMargin: 20
+                text: qsTr("UAV")
+                onClicked: rbUGV.checked = false
+
+            }
+            RadioButton {
+                id: rbUGV
+                anchors.top: recInput.top
+                anchors.topMargin: 10
+                anchors.left: rbUAV.right
+                anchors.leftMargin: 30
+                text: qsTr("UGV")
+                onClicked: rbUAV.checked = false
+            }
+
+            RadioButton {
+                id: rbChemical
+                anchors.top: rbUAV.bottom
+                anchors.topMargin: 10
+                anchors.left: recInput.left
+                anchors.leftMargin: 20
+                text: qsTr("Chemical")
+                onClicked: rbRadioActive.checked = false
+
+            }
+            RadioButton {
+                id: rbRadioActive
+                anchors.top: rbUGV.bottom
+                anchors.topMargin: 10
+                anchors.left: rbChemical.right
+                anchors.leftMargin: 30
+                text: qsTr("Radio Active")
+                onClicked: rbChemical.checked = false
+            }
+        }
+
+        /*
         Item {
             anchors.fill:   rightPanel
 
-            /*
+
             // Plan Element selector (Mission/Fence/Rally)
             Row {
                 id:                 planElementSelectorRow
@@ -594,7 +709,8 @@ Rectangle {
                         onInsertComplexItem:    insertComplexMissionItem(complexItemName, editorMap.center, index)
                     }
                 } // QGCListView
-            } */ //Item - Mission Item editor
+            }  //Item - Mission Item editor
+
 
             // GeoFence Editor
             GeoFenceEditor {
@@ -631,7 +747,9 @@ Rectangle {
                 controller:         _rallyPointController
             }
         } // Right panel
+      */
 
+        //Show map scale
         MapScale {
             id:                 mapScale
             anchors.margins:    ScreenTools.defaultFontPixelHeight * (0.66)
@@ -641,19 +759,22 @@ Rectangle {
             visible:            _toolStripBottom < y
         }
 
-        /*
+
+
         MissionItemStatus {
             id:                 waypointValuesDisplay
             anchors.margins:    ScreenTools.defaultFontPixelWidth
             anchors.left:       parent.left
-            height:             ScreenTools.defaultFontPixelHeight * 7
+            height:             ScreenTools.defaultFontPixelHeight
             maxWidth:           parent.width - rightPanel.width - x
             anchors.bottom:     parent.bottom
             missionItems:       _missionController.visualItems
             visible:            _editingLayer === _layerMission && (_toolStripBottom + mapScale.height) < y && QGroundControl.corePlugin.options.showMissionStatus
-        }*/
+        }
+
     } // QGCViewPanel
 
+     /*
     Component {
         id: syncLoadFromVehicleOverwrite
         QGCViewMessage {
@@ -666,6 +787,7 @@ Rectangle {
         }
     }
 
+
     Component {
         id: syncLoadFromFileOverwrite
         QGCViewMessage {
@@ -677,6 +799,7 @@ Rectangle {
             }
         }
     }
+
 
     Component {
         id: removeAllPromptDialog
@@ -693,7 +816,9 @@ Rectangle {
             }
         }
     }
+    */
 
+    /*
     //- ToolStrip DropPanel Components
 
     Component {
@@ -729,6 +854,7 @@ Rectangle {
         } // Column
     }
 
+    /*
     Component {
         id: syncDropPanel
 
@@ -827,4 +953,5 @@ Rectangle {
             }
         }
     }
+    */
 }
