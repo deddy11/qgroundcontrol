@@ -61,6 +61,8 @@ Rectangle {
     readonly property int       _layerRallyPoints:          3
     readonly property string    _armedVehicleUploadPrompt:  qsTr("Vehicle is currently armed. Do you want to upload the mission to the vehicle?")
 
+    property var    _circleItem
+
     Component.onCompleted: {
         toolbar.planMasterController =  Qt.binding(function () { return _planMasterController })
         toolbar.currentMissionItem =    Qt.binding(function () { return _missionController.currentPlanViewItem })
@@ -474,7 +476,7 @@ Rectangle {
             id:                 rightPanel
             anchors.top:        parent.top
             anchors.right:      parent.right
-            height:             200
+            height:             250
             width:              _rightPanelWidth
             color:              "white"
             opacity:            0.5
@@ -487,6 +489,18 @@ Rectangle {
             anchors.right:      parent.right
             width:              _rightPanelWidth
             color:              qgcPal.window
+
+            Text {
+                id: textConsentration
+                anchors.verticalCenter: tfConsentration.verticalCenter
+                anchors.left: recInput.left
+                width: 108
+                height: 22
+                text: qsTr("Consentration")
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 12
+            }
 
             Text {
                 id: textLat
@@ -525,8 +539,19 @@ Rectangle {
             }
 
             TextField {
-                id: tfLat
+                id: tfConsentration
                 anchors.top: rbChemical.bottom
+                anchors.topMargin: 5
+                anchors.left: textConsentration.right
+                width: 126
+                height: 30
+                font.pointSize: 11
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            TextField {
+                id: tfLat
+                anchors.top: tfConsentration.bottom
                 anchors.topMargin: 5
                 anchors.left: textLat.right
                 width: 126
@@ -595,6 +620,21 @@ Rectangle {
                 anchors.leftMargin: 30
                 text: qsTr("Radio Active")
                 onClicked: rbChemical.checked = false
+            }
+            Button{
+                id: buttonCreate
+                anchors.top: tfAlt.bottom
+                anchors.left: recInput.left
+                anchors.topMargin: 10
+                anchors.leftMargin: 20
+                text: qsTr("Create")
+                onClicked: {
+                    var component = Qt.createComponent("MakeCircleVisualization.qml")
+                    if (component.status === Component.Ready) {
+//                        _circleItem = component.createObject(editorMap, { "map": editorMap, "_coordinate": QtPositioning.coordinate(tfLat.text,tfLong.text,tfAlt.text)})
+                        _circleItem = component.createObject(editorMap, { "map": editorMap, "_lat": tfLat.text, "_lon": tfLong.text, "_alt": tfAlt.text, "_vehicleType": rbUAV.checked ? 0 : 1, "_substanceType": rbChemical ? 0 : 1, "_subsConsentration": tfConsentration.text })
+                    }
+                }
             }
         }
 
