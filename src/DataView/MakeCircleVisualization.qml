@@ -21,12 +21,14 @@ Item {
     property var    _visible
     property int    _vehicleType
     property int    _substanceType
-    property int   _subsConsentration
+    property int    _subsConsentration
+    property bool   _isCheckedUAVBox
+    property bool   _isCheckedUGVBox
 
     property var    _color
-    property int   _indicatorRadius:   15
-    property int   _labelMargin:       2
-    property int   _labelRadius:       _indicatorRadius + _labelMargin
+    property int    _indicatorRadius:   15
+    property int    _labelMargin:       2
+    property int    _labelRadius:       _indicatorRadius + _labelMargin
 
     Component.onCompleted: {
         if ((_subsConsentration > 0) && (_subsConsentration < 10)) {
@@ -46,6 +48,8 @@ Item {
                     "MapQuickItem {" +
                     "   id: circleItem;"+
                     "   sourceItem: Rectangle { " +
+                    "               id:     recMain;"+
+                    "               visible: (_vehicleType == 0)? _isCheckedUAVBox : _isCheckedUGVBox;" +
                     "                   Rectangle {"+
                     "                       id:                     labelControl;"+
                     "                       anchors.leftMargin:     -((_labelMargin * 2) + indicator.width);"+

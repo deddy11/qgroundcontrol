@@ -471,19 +471,67 @@ Rectangle {
             }
         } // FlightMap
 
+        Rectangle {
+            id:                 leftPanel
+            anchors.leftMargin: 80
+            anchors.left:       parent.left
+            anchors.topMargin:  ScreenTools.toolbarHeight + (_margins * 2)
+            anchors.top:        parent.top
+            height:             100
+            width:              _rightPanelWidth
+            color:              "white"
+            opacity:            0.5
+        }
+
+        CheckBox {
+            id:                 cbUAV
+            anchors.top:        leftPanel.top
+            anchors.topMargin:  10
+            anchors.left:       leftPanel.left
+            anchors.leftMargin: 10
+            text:               qsTr("UAV")
+        }
+
+        CheckBox {
+            id:                 cbUGV
+            anchors.top:        leftPanel.top
+            anchors.topMargin:  10
+            anchors.left:       cbChemical.right
+            anchors.leftMargin: 10
+            text:               qsTr("UGV")
+        }
+
+        CheckBox {
+            id:                 cbChemical
+            anchors.top:        cbUAV.bottom
+            anchors.topMargin:  10
+            anchors.left:       leftPanel.left
+            anchors.leftMargin: 10
+            text:               qsTr("Chemical")
+        }
+
+        CheckBox {
+            id:                 cbRadioActive
+            anchors.top:        cbUGV.bottom
+            anchors.topMargin:  10
+            anchors.left:       cbChemical.right
+            anchors.leftMargin: 10
+            text:               qsTr("Radio Active")
+        }
+
         // Right pane for mission editing controls
         Rectangle {
             id:                 rightPanel
             anchors.top:        parent.top
             anchors.right:      parent.right
-            height:             250
+            height:             260
             width:              _rightPanelWidth
             color:              "white"
             opacity:            0.5
         }
 
         Rectangle {
-            id: recInput
+            id:                 recInput
             anchors.top:        parent.top
             anchors.topMargin:  10
             anchors.right:      parent.right
@@ -631,8 +679,10 @@ Rectangle {
                 onClicked: {
                     var component = Qt.createComponent("MakeCircleVisualization.qml")
                     if (component.status === Component.Ready) {
-//                        _circleItem = component.createObject(editorMap, { "map": editorMap, "_coordinate": QtPositioning.coordinate(tfLat.text,tfLong.text,tfAlt.text)})
-                        _circleItem = component.createObject(editorMap, { "map": editorMap, "_lat": tfLat.text, "_lon": tfLong.text, "_alt": tfAlt.text, "_vehicleType": rbUAV.checked ? 0 : 1, "_substanceType": rbChemical ? 0 : 1, "_subsConsentration": tfConsentration.text })
+                        _circleItem = component.createObject(editorMap,
+                                    { "map": editorMap, "_lat": tfLat.text, "_lon": tfLong.text, "_alt": tfAlt.text,
+                                      "_vehicleType": rbUAV.checked ? 0 : 1, "_substanceType": rbChemical ? 0 : 1, "_isCheckedUGVBox": cbUGV.checked,
+                                      "_subsConsentration": tfConsentration.text, "_isCheckedUAVBox": cbUAV.checked })
                     }
                 }
             }
