@@ -33,13 +33,14 @@ Item {
     property var    activeVehicle:      QGroundControl.multiVehicleManager.activeVehicle
     property string formatedMessage:    activeVehicle ? activeVehicle.formatedMessage : ""
 
-    property var _viewList: [ settingsViewLoader, setupViewLoader, planViewLoader, flightView, analyzeViewLoader, dataViewLoader ]
+    property var _viewList: [ settingsViewLoader, setupViewLoader, planViewLoader, flightView, analyzeViewLoader, dataViewLoader, consoleViewLoader ]
 
     readonly property string _settingsViewSource:   "AppSettings.qml"
     readonly property string _setupViewSource:      "SetupView.qml"
     readonly property string _planViewSource:       "PlanView.qml"
     readonly property string _analyzeViewSource:    "AnalyzeView.qml"
-    readonly property string _dataViewSource:       "DataView.qml"   //Added by Deddy
+    readonly property string _dataViewSource:       "DataView.qml"      //Added by Deddy
+    readonly property string _consoleViewSource:    "Console.qml"       //Added by Deddy
 
     onHeightChanged: {
         //-- We only deal with the available height if within the Fly or Plan view
@@ -151,7 +152,23 @@ Item {
         hideAllViews()
         dataViewLoader.visible = true
         toolBar.checkDataButton()
-    }//ends here
+    }
+
+    function showConsoleView() {
+        mainWindow.enableToolbar()
+        rootLoader.sourceComponent = null
+        if(currentPopUp) {
+            currentPopUp.close()
+        }
+        ScreenTools.availableHeight = 0
+        if (consoleViewLoader.source  != _consoleViewSource) {
+            consoleViewLoader.source  = _consoleViewSource
+        }
+        hideAllViews()
+        consoleViewLoader.visible = true
+        toolBar.checkConsoleButton()
+    }
+    //ends here
 
     /// Start the process of closing QGroundControl. Prompts the user are needed.
     function attemptWindowClose() {
@@ -302,6 +319,7 @@ Item {
         onShowFlyView:          mainWindow.showFlyView()
         onShowAnalyzeView:      mainWindow.showAnalyzeView()
         onShowDataView:         mainWindow.showDataView()       //Added by Deddy Welsan
+        onShowConsoleView:      mainWindow.showConsoleView()       //Added by Deddy Welsan
         onArmVehicle:           flightView.guidedController.confirmAction(flightView.guidedController.actionArm)
         onDisarmVehicle: {
             if (flightView.guidedController.showEmergenyStop) {
@@ -402,7 +420,16 @@ Item {
         anchors.top:        toolBar.bottom
         anchors.bottom:     parent.bottom
         visible:            false
-    }//ends here
+    }
+    Loader {
+        id:                 consoleViewLoader
+        anchors.left:       parent.left
+        anchors.right:      parent.right
+        anchors.top:        toolBar.bottom
+        anchors.bottom:     parent.bottom
+        visible:            false
+    }
+    //ends here
 
     //-------------------------------------------------------------------------
     //-- Dismiss Pop Up Messages

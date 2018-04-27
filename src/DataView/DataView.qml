@@ -83,20 +83,6 @@ Rectangle {
                 exclusiveGroup: setupButtonGroup
                 onClicked:      panelLoader.source = "TableOfData.qml"
             }
-
-            QGCButton {
-                text:           "Save Log"
-                width:          _butttonWidth
-                exclusiveGroup: setupButtonGroup
-//                onClicked:      panelLoader.source = pageSource
-            }
-
-            QGCButton {
-                text:           "Load Log"
-                width:          _butttonWidth
-                exclusiveGroup: setupButtonGroup
-//                onClicked:      panelLoader.source = pageSource
-            }
         }
     }
 

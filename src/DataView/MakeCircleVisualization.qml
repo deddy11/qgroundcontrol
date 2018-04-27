@@ -12,13 +12,14 @@ import QGroundControl.FlightMap     1.0
 /// Simple Mission Item visuals
 Item {
     id: root
+    visible: true
 
     property var map        ///< Map control to place item in
 
     property real   _lat
     property real   _lon
     property real   _alt
-    property var    _visible
+
     property int    _vehicleType
     property int    _substanceType
     property int    _subsConsentration
@@ -49,7 +50,6 @@ Item {
                     "   id: circleItem;"+
                     "   sourceItem: Rectangle { " +
                     "               id:     recMain;"+
-                    "               visible: (_vehicleType == 0)? _isCheckedUAVBox : _isCheckedUGVBox;" +
                     "                   Rectangle {"+
                     "                       id:                     labelControl;"+
                     "                       anchors.leftMargin:     -((_labelMargin * 2) + indicator.width);"+

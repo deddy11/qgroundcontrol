@@ -383,6 +383,7 @@ Rectangle {
                 }
             }
 
+            /*
             // Add the mission item visuals to the map
             Repeater {
                 model: _editingLayer == _layerMission ? _missionController.visualItems : undefined
@@ -394,6 +395,7 @@ Rectangle {
                     visible:    _editingLayer == _layerMission
                 }
             }
+            */
         /*
             // Add lines between waypoints
             MissionLineView {
@@ -637,6 +639,7 @@ Rectangle {
                 anchors.left: recInput.left
                 anchors.leftMargin: 20
                 text: qsTr("UAV")
+                checked: true
                 onClicked: rbUGV.checked = false
 
             }
@@ -657,6 +660,7 @@ Rectangle {
                 anchors.left: recInput.left
                 anchors.leftMargin: 20
                 text: qsTr("Chemical")
+                checked: true
                 onClicked: rbRadioActive.checked = false
 
             }
@@ -843,14 +847,14 @@ Rectangle {
         MapScale {
             id:                 mapScale
             anchors.margins:    ScreenTools.defaultFontPixelHeight * (0.66)
-            anchors.bottom:     waypointValuesDisplay.visible ? waypointValuesDisplay.top : parent.bottom
+            anchors.bottom:     parent.bottom
             anchors.left:       parent.left
             mapControl:         editorMap
             visible:            _toolStripBottom < y
         }
 
 
-
+        /*
         MissionItemStatus {
             id:                 waypointValuesDisplay
             anchors.margins:    ScreenTools.defaultFontPixelWidth
@@ -861,6 +865,7 @@ Rectangle {
             missionItems:       _missionController.visualItems
             visible:            _editingLayer === _layerMission && (_toolStripBottom + mapScale.height) < y && QGroundControl.corePlugin.options.showMissionStatus
         }
+        */
 
     } // QGCViewPanel
 

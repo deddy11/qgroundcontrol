@@ -214,13 +214,13 @@ int main(int argc, char *argv[])
     QApplication::setWindowIcon(QIcon(":/res/resources/icons/qgroundcontrol.ico"));
 
     //This is added by Deddy to get proxy access
-//    QNetworkProxy proxy;
-//    proxy.setType(QNetworkProxy::HttpProxy);
-//    proxy.setHostName("cache.itb.ac.id");
-//    proxy.setPort(8080);
-//    proxy.setUser("deddy11");
-//    proxy.setPassword("10568173");
-//    QNetworkProxy::setApplicationProxy(proxy);
+    QNetworkProxy proxy;
+    proxy.setType(QNetworkProxy::HttpProxy);
+    proxy.setHostName("cache.itb.ac.id");
+    proxy.setPort(8080);
+    proxy.setUser("deddy11");
+    proxy.setPassword("10568173");
+    QNetworkProxy::setApplicationProxy(proxy);
     //editing ends here
 
 #endif /* Q_OS_LINUX */

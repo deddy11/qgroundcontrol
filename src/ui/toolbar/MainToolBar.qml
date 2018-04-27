@@ -33,6 +33,7 @@ Rectangle {
     signal showFlyView
     signal showAnalyzeView
     signal showDataView //Added by Deddy Welsan
+    signal showConsoleView //Added by Deddy Welsan
     signal armVehicle
     signal disarmVehicle
     signal vtolTransitionToFwdFlight
@@ -60,6 +61,9 @@ Rectangle {
     //Added by Deddy Welsan
     function checkDataButton() {
         dataButton.checked = true
+    }
+    function checkConsoleButton() {
+        consoleButton.checked = true
     }
 
     Component.onCompleted: {
@@ -149,7 +153,15 @@ Rectangle {
                 exclusiveGroup:     mainActionGroup
                 source:             "/qmlimages/Analyze.svg"
                 onClicked:          toolBar.showDataView()
-            } //ends here
+            }
+            QGCToolBarButton {
+                id:                 consoleButton
+                anchors.top:        parent.top
+                anchors.bottom:     parent.bottom
+                exclusiveGroup:     mainActionGroup
+                source:             "/qmlimages/Analyze.svg"
+                onClicked:          toolBar.showConsoleView()
+            }//ends here
 
             Rectangle {
                 anchors.margins:    ScreenTools.defaultFontPixelHeight / 2

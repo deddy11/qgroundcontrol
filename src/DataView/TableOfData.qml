@@ -58,7 +58,7 @@ AnalyzePage {
                 Layout.fillWidth:   true
 
                 TableViewColumn {
-                    title: qsTr("Id")
+                    title: qsTr("No")
                     width: ScreenTools.defaultFontPixelWidth * 6
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
@@ -71,7 +71,7 @@ AnalyzePage {
                 }
 
                 TableViewColumn {
-                    title: qsTr("Date")
+                    title: qsTr("Vehicle")
                     width: ScreenTools.defaultFontPixelWidth * 34
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
@@ -93,7 +93,7 @@ AnalyzePage {
                 }
 
                 TableViewColumn {
-                    title: qsTr("Size")
+                    title: qsTr("Contaminant")
                     width: ScreenTools.defaultFontPixelWidth * 18
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
@@ -106,7 +106,20 @@ AnalyzePage {
                 }
 
                 TableViewColumn {
-                    title: qsTr("Status")
+                    title: qsTr("Consentration")
+                    width: ScreenTools.defaultFontPixelWidth * 22
+                    horizontalAlignment: Text.AlignHCenter
+                    delegate : Text  {
+                        horizontalAlignment: Text.AlignHCenter
+                        text: {
+                            var o = logController.model.get(styleData.row)
+                            return o ? o.status : ""
+                        }
+                    }
+                }
+
+                TableViewColumn {
+                    title: qsTr("Position")
                     width: ScreenTools.defaultFontPixelWidth * 22
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
@@ -139,7 +152,7 @@ AnalyzePage {
 
                 QGCButton {
                     enabled:    !logController.requestingList && !logController.downloadingLogs && tableView.selection.count > 0
-                    text:       qsTr("Download")
+                    text:       qsTr("Load")
                     width:      _butttonWidth
                     onClicked: {
                         //-- Clear selection
@@ -171,8 +184,15 @@ AnalyzePage {
                 }
 
                 QGCButton {
+                    text:       qsTr("Save")
+                    width:      _butttonWidth
+                    enabled:    logController.requestingList || logController.downloadingLogs
+                    onClicked:  logController.cancel()
+                }
+
+                QGCButton {
                     enabled:    !logController.requestingList && !logController.downloadingLogs && logController.model.count > 0
-                    text:       qsTr("Erase All")
+                    text:       qsTr("Clear All")
                     width:      _butttonWidth
                     onClicked:  tableDataPage.showDialog(eraseAllMessage,
                                                            qsTr("Delete All Log Files"),
@@ -191,14 +211,7 @@ AnalyzePage {
                             }
                         }
                     }
-                }
-
-                QGCButton {
-                    text:       qsTr("Cancel")
-                    width:      _butttonWidth
-                    enabled:    logController.requestingList || logController.downloadingLogs
-                    onClicked:  logController.cancel()
-                }
+                }     
             } // Column - Buttons
         } // RowLayout
     } // Component
