@@ -10,7 +10,7 @@ Website: <http://qgroundcontrol.com>
 
 ## Obtaining source code
 
-Source code for QGroundControl is kept on GitHub: https://github.com/mavlink/qgroundcontrol.
+Source code for QGroundControl is kept on GitHub: https://github.com/deddy11/qgroundcontrol.git
 ```
 git clone --recursive https://github.com/mavlink/qgroundcontrol.git
 ```
