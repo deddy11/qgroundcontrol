@@ -83,6 +83,7 @@
 #include "CameraCalc.h"
 #include "VisualMissionItem.h"
 #include "EditPositionDialogController.h"
+#include "terminal.h"
 
 #ifndef NO_SERIAL_LINK
 #include "SerialLink.h"
@@ -387,6 +388,7 @@ void QGCApplication::_initCommon(void)
     qmlRegisterType<LogDownloadController>          ("QGroundControl.Controllers", 1, 0, "LogDownloadController");
     qmlRegisterType<SyslinkComponentController>     ("QGroundControl.Controllers", 1, 0, "SyslinkComponentController");
     qmlRegisterType<EditPositionDialogController>   ("QGroundControl.Controllers", 1, 0, "EditPositionDialogController");
+    qmlRegisterType<Terminal>                       ("QGroundControl.Controllers", 1, 0, "Terminal");
 #ifndef __mobile__
     qmlRegisterType<ViewWidgetController>           ("QGroundControl.Controllers", 1, 0, "ViewWidgetController");
     qmlRegisterType<CustomCommandWidgetController>  ("QGroundControl.Controllers", 1, 0, "CustomCommandWidgetController");
