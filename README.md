@@ -12,7 +12,7 @@ Website: <http://qgroundcontrol.com>
 
 Source code for QGroundControl is kept on GitHub: https://github.com/deddy11/qgroundcontrol.git
 ```
-git clone --recursive https://github.com/mavlink/qgroundcontrol.git
+git clone --recursive hhttps://github.com/deddy11/qgroundcontrol.git
 ```
 Each time you pull new source to your repository you should run `git submodule update` to get the latest submodules as well. Since QGroundControl uses submodules, using the zip file for source download will not work. You must use git.
 
