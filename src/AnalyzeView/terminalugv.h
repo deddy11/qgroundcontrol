@@ -1,5 +1,5 @@
-#ifndef TERMINAL_H
-#define TERMINAL_H
+#ifndef TERMINALUGV_H
+#define TERMINALUGV_H
 
 #include <QObject>
 #include <iostream>
@@ -9,11 +9,11 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-class Terminal : public QObject
+class TerminalUGV : public QObject
 {
     Q_OBJECT
 public:
-    explicit Terminal(QObject *parent = nullptr);
+    explicit TerminalUGV(QObject *parent = nullptr);
 
 public slots:
     void sendCommand(QString command);
@@ -25,4 +25,4 @@ signals:
 public slots:
 };
 
-#endif // TERMINAL_H
+#endif // TERMINALUGV_H

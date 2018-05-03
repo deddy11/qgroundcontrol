@@ -39,6 +39,10 @@ Rectangle {
         id: terminal
     }
 
+    TerminalUGV{
+        id: terminalUGV
+    }
+
     QGCFlickable {
         id:                 buttonScroll
         width:              buttonColumn.width
@@ -86,7 +90,7 @@ Rectangle {
                 onClicked:      {
                     tabviewUAV.addTab("UAV ", componentUAVTab)
                     tabviewUAV.currentIndex = tabviewUAV.count - 1
-                    terminal.openTerminal()
+//                    terminal.openTerminal()
                 }
             }
 
@@ -112,6 +116,20 @@ Rectangle {
                 width:          _butttonWidth
                 exclusiveGroup: setupButtonGroup
                 onClicked:      tabviewUGV.removeTab(tabviewUGV.currentIndex)
+            }
+
+            QGCButton {
+                text:           qsTr("Clear UAV Tab")
+                width:          _butttonWidth
+                exclusiveGroup: setupButtonGroup
+                onClicked:      tabviewUAV.getTab(tabviewUAV.currentIndex).item.text = ""
+            }
+
+            QGCButton {
+                text:           qsTr("Clear UGV Tab")
+                width:          _butttonWidth
+                exclusiveGroup: setupButtonGroup
+                onClicked:      tabviewUGV.getTab(tabviewUGV.currentIndex).item.text = ""
             }
         }
     }
@@ -264,8 +282,8 @@ Rectangle {
             anchors.right:          parent.right
             placeholderText: qsTr("Input UGV command here . . .")
             onAccepted: {
-
                 tabviewUGV.getTab(tabviewUGV.currentIndex).item.append(textFieldUGV.text)
+                terminalUGV.sendCommand(textFieldUGV.text)
                 textFieldUGV.text = ""
             }
         }

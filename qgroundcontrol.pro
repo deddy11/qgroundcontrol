@@ -393,14 +393,16 @@ HEADERS += \
     src/api/QGCOptions.h \
     src/api/QGCSettings.h \
     src/api/QmlComponentInfo.h \
-    src/AnalyzeView/terminal.h
+    src/AnalyzeView/terminal.h \
+    src/AnalyzeView/terminalugv.h
 
 SOURCES += \
     src/api/QGCCorePlugin.cc \
     src/api/QGCOptions.cc \
     src/api/QGCSettings.cc \
     src/api/QmlComponentInfo.cc \
-    src/AnalyzeView/terminal.cpp
+    src/AnalyzeView/terminal.cpp \
+    src/AnalyzeView/terminalugv.cpp
 
 #
 # Unit Test specific configuration goes here (requires full debug build with all plugins)

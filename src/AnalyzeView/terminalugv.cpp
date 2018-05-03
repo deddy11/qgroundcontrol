@@ -1,16 +1,16 @@
-#include "terminal.h"
+#include "terminalugv.h"
 
 using namespace std;
 
-Terminal::Terminal(QObject *parent) : QObject(parent)
+TerminalUGV::TerminalUGV(QObject *parent) : QObject(parent)
 {
 
 }
 
-void Terminal::sendCommand(QString command)
+void TerminalUGV::sendCommand(QString command)
 {
     int fd;
-    char myfifo[] = "/tmp/UAVtemp";
+    char myfifo[] = "/tmp/UGVtemp";
     string command2 = command.toStdString();
 
     char *myfifo2 = myfifo;
@@ -29,9 +29,8 @@ void Terminal::sendCommand(QString command)
     return;
 }
 
-void Terminal::openTerminal()
+void TerminalUGV::openTerminal()
 {
-
     pid_t pid = fork();
     if (pid == 0) {
         //kid
@@ -43,7 +42,5 @@ void Terminal::openTerminal()
     }
 
     return;
-
 }
-
 
