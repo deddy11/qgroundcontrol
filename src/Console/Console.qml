@@ -39,10 +39,6 @@ Rectangle {
         id: terminal
     }
 
-    TerminalUGV{
-        id: terminalUGV
-    }
-
     QGCFlickable {
         id:                 buttonScroll
         width:              buttonColumn.width
@@ -90,7 +86,7 @@ Rectangle {
                 onClicked:      {
                     tabviewUAV.addTab("UAV ", componentUAVTab)
                     tabviewUAV.currentIndex = tabviewUAV.count - 1
-//                    terminal.openTerminal()
+                    terminal.openTerminalUAV()
                 }
             }
 
@@ -101,6 +97,7 @@ Rectangle {
                 onClicked:      {
                     tabviewUGV.addTab("UGV ", componentUGVTab)
                     tabviewUGV.currentIndex = tabviewUGV.count - 1
+                    terminal.openTerminalUGV()
                 }
             }
 
@@ -169,27 +166,8 @@ Rectangle {
             anchors.bottom:         textFieldUAV.top
             anchors.right:          divider.left
             tabsVisible: true
-//            Tab {
-//                title: "UAV "
-//                TextArea {
-//                    id: textAreaUAV
-//                    anchors.topMargin:      _verticalMargin
-//                    anchors.bottomMargin:   _verticalMargin
-//                    anchors.leftMargin:     _horizontalMargin
-//                    anchors.rightMargin:    _horizontalMargin
-//                    anchors.left:           parent.left
-//                    anchors.top:            parent.top
-//                    anchors.bottom:         parent.bottom
-//                    anchors.right:          parent.right
-//                    backgroundVisible: false
-//                    textColor: "white"
-//                    wrapMode: Text.Wrap
-//                    font.pixelSize: 15
-//                }
-//            }
 
             style: TabViewStyle {
-//                frameOverlap: 1
                 tab: Rectangle {
                     color: styleData.selected ? "black" :"grey"
                     implicitWidth:60
@@ -217,27 +195,8 @@ Rectangle {
             anchors.bottom:         textFieldUGV.top
             anchors.right:          parent.right
             tabsVisible: true
-//            Tab {
-//                title: "UGV "
-//                TextArea {
-//                    id: textAreaUGV
-//                    anchors.topMargin:      _verticalMargin
-//                    anchors.bottomMargin:   _verticalMargin
-//                    anchors.leftMargin:     _horizontalMargin
-//                    anchors.rightMargin:    _horizontalMargin
-//                    anchors.left:           parent.left
-//                    anchors.top:            parent.top
-//                    anchors.bottom:         parent.bottom
-//                    anchors.right:          parent.right
-//                    backgroundVisible: false
-//                    textColor: "white"
-//                    wrapMode: Text.Wrap
-//                    font.pixelSize: 15
-//                }
-//            }
 
             style: TabViewStyle {
-//                frameOverlap: 1
                 tab: Rectangle {
                     color: styleData.selected ? "black" :"grey"
                     implicitWidth:60
@@ -266,7 +225,7 @@ Rectangle {
             placeholderText: qsTr("Input UAV command here . . .")
             onAccepted: {
                 tabviewUAV.getTab(tabviewUAV.currentIndex).item.append(textFieldUAV.text)
-                terminal.sendCommand(textFieldUAV.text)
+                terminal.sendCommandUAV(textFieldUAV.text)
                 textFieldUAV.text = ""
             }
         }
@@ -283,7 +242,7 @@ Rectangle {
             placeholderText: qsTr("Input UGV command here . . .")
             onAccepted: {
                 tabviewUGV.getTab(tabviewUGV.currentIndex).item.append(textFieldUGV.text)
-                terminalUGV.sendCommand(textFieldUGV.text)
+                terminal.sendCommandUGV(textFieldUGV.text)
                 textFieldUGV.text = ""
             }
         }

@@ -696,6 +696,10 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
     case MAVLINK_MSG_ID_HIGH_LATENCY2:
         _handleHighLatency2(message);
         break;
+    //added
+    case MAVLINK_MSG_ID_CONTAMINANT:
+        _handleContaminant(message);
+        break;
 
     case MAVLINK_MSG_ID_SERIAL_CONTROL:
     {
@@ -935,6 +939,21 @@ void Vehicle::_setCapabilities(uint64_t capabilityBits)
     qCDebug(VehicleLog) << QString("Vehicle %1 MISSION_ITEM_INT").arg(_capabilityBits & MAV_PROTOCOL_CAPABILITY_MISSION_INT ? supports : doesNotSupport);
     qCDebug(VehicleLog) << QString("Vehicle %1 GeoFence").arg(_capabilityBits & MAV_PROTOCOL_CAPABILITY_MISSION_FENCE ? supports : doesNotSupport);
     qCDebug(VehicleLog) << QString("Vehicle %1 RallyPoints").arg(_capabilityBits & MAV_PROTOCOL_CAPABILITY_MISSION_RALLY ? supports : doesNotSupport);
+}
+
+//added
+void Vehicle::_handleContaminant(mavlink_message_t &message)
+{
+    mavlink_contaminant_t contaminant;
+    mavlink_msg_contaminant_decode(&message, &contaminant);
+
+    _contaminantCoordinate.setLatitude(contaminant.lat  / (double)1E7);
+    _contaminantCoordinate.setLongitude(contaminant.lon / (double)1E7);
+    _contaminantCoordinate.setAltitude(contaminant.alt  / 1000.0);
+    _contaminantType = contaminant.type;
+    _contaminantConsentration = contaminant.msr;
+
+//    emit coordinateChanged(_coordinate);
 }
 
 void Vehicle::_handleAutopilotVersion(LinkInterface *link, mavlink_message_t& message)

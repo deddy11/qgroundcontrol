@@ -354,6 +354,11 @@ public:
     Q_PROPERTY(bool                 vtolInFwdFlight         READ vtolInFwdFlight        WRITE setVtolInFwdFlight        NOTIFY vtolInFwdFlightChanged)
     Q_PROPERTY(bool                 highLatencyLink         READ highLatencyLink                                        NOTIFY highLatencyLinkChanged)
 
+    //added
+    Q_PROPERTY(QGeoCoordinate       contaminantCoordinate           READ contaminantCoordinate                         )
+    Q_PROPERTY(int                  contaminantType                 READ contaminantType                               )
+    Q_PROPERTY(int                  contaminantConsentration        READ contaminantConsentration                      )
+
     // Vehicle state used for guided control
     Q_PROPERTY(bool flying                  READ flying NOTIFY flyingChanged)                               ///< Vehicle is flying
     Q_PROPERTY(bool landing                 READ landing NOTIFY landingChanged)                             ///< Vehicle is in landing pattern (DO_LAND_START)
@@ -482,6 +487,11 @@ public:
     // Property accessors
 
     QGeoCoordinate coordinate(void) { return _coordinate; }
+
+    //added
+    QGeoCoordinate contaminantCoordinate(void) { return _contaminantCoordinate; }
+    int contaminantType(void) { return _contaminantType; }
+    int contaminantConsentration(void) { return _contaminantConsentration; }
 
     typedef enum {
         JoystickModeRC,         ///< Joystick emulates an RC Transmitter
@@ -941,6 +951,9 @@ private:
     void _setupAutoDisarmSignalling(void);
     void _setCapabilities(uint64_t capabilityBits);
 
+    //added
+    void _handleContaminant(mavlink_message_t& message);
+
     int     _id;                    ///< Mavlink system id
     int     _defaultComponentId;
     bool    _active;
@@ -1001,6 +1014,12 @@ private:
     bool            _vehicleCapabilitiesKnown;
     uint64_t        _capabilityBits;
     bool            _highLatencyLink;
+
+    //added
+    QGeoCoordinate  _contaminantCoordinate;
+    int             _contaminantType;
+    int             _contaminantConsentration;
+
 
     QGCCameraManager* _cameras;
 

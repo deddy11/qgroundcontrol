@@ -383,6 +383,19 @@ Rectangle {
                 }
             }
 
+            //Add Contaminant Circle
+            MapItemView {
+                model: QGroundControl.multiVehicleManager.vehicles
+
+                delegate: ContaminantCircle {
+                    vehicle:            object
+                    map:                editorMap
+                    coordinate:         object.contaminantCoordinate
+                    subsType:           object.contaminantType
+                    subsConsentration:  object.contaminantConsentration
+                }
+            }
+
             /*
             // Add the mission item visuals to the map
             Repeater {

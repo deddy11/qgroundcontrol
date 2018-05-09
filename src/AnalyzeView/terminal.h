@@ -16,9 +16,10 @@ public:
     explicit Terminal(QObject *parent = nullptr);
 
 public slots:
-    void sendCommand(QString command);
-
-    void openTerminal(void);
+    void sendCommandUAV(QString command);
+    void openTerminalUAV(void);
+    void sendCommandUGV(QString command);
+    void openTerminalUGV(void);
 
 signals:
 
