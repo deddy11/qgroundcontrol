@@ -22,8 +22,6 @@ public slots:
     void openTerminalUGV(void);
 
 signals:
-
-public slots:
 };
 
 #endif // TERMINAL_H

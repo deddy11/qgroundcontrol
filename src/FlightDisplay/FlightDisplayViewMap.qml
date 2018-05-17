@@ -178,6 +178,19 @@ FlightMap {
         }
     }
 
+//    MapItemView {
+//        model: _activeVehicle.contaminants
+
+//        delegate: ContaminantCircle {
+//            vehicle:            QGroundControl.multiVehicleManager.vehicles
+//            map:                flightMap
+//            coordinate:         object.coordinate
+//            alt:                0
+//            subsType:           0
+//            subsConsentration:  0
+//        }
+//    }
+
     // Add the vehicles to the map
     MapItemView {
         model: QGroundControl.multiVehicleManager.vehicles

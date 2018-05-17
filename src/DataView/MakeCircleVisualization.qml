@@ -32,12 +32,18 @@ Item {
     property int    _labelRadius:       _indicatorRadius + _labelMargin
 
     Component.onCompleted: {
-        if ((_subsConsentration > 0) && (_subsConsentration < 10)) {
+        if (_subsConsentration == 0) {
             _color = 'green'
-        }else if ((_subsConsentration >= 10) && (_subsConsentration < 20)) {
-            _color = 'blue'
+        }else if (_subsConsentration == 1) {
+            _color = "#FFE000"
+        }else if (_subsConsentration == 2) {
+            _color = "#FFA500"
+        }else if (_subsConsentration == 3){
+            _color = "#FF5500"
+        }else if (_subsConsentration == 4){
+            _color = "#FF0000"
         }else {
-            _color = 'red'
+
         }
 
         var circle = Qt.createQmlObject(

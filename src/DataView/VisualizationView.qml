@@ -63,10 +63,10 @@ Rectangle {
 
     property var    _circleItem
 
-    Component.onCompleted: {
-        toolbar.planMasterController =  Qt.binding(function () { return _planMasterController })
-        toolbar.currentMissionItem =    Qt.binding(function () { return _missionController.currentPlanViewItem })
-    }
+//    Component.onCompleted: {
+//        toolbar.planMasterController =  Qt.binding(function () { return _planMasterController })
+//        toolbar.currentMissionItem =    Qt.binding(function () { return _missionController.currentPlanViewItem })
+//    }
 
     function addComplexItem(complexItemName) {
         var coordinate = editorMap.center
@@ -383,16 +383,29 @@ Rectangle {
                 }
             }
 
+//            MapItemView {
+//                model: QGroundControl.multiVehicleManager.vehicles
+//                delegate:
+//                    VehicleMapItem {
+//                    vehicle:        object
+//                    coordinate:     object.coordinate
+//                    map:            editorMap
+//                    size:           ScreenTools.defaultFontPixelHeight * 3
+//                    z:              QGroundControl.zOrderMapItems - 1
+//                }
+//            }
+
             //Add Contaminant Circle
             MapItemView {
-                model: QGroundControl.multiVehicleManager.vehicles
+                model: QGroundControl.multiVehicleManager.activeVehicle.contaminants
 
                 delegate: ContaminantCircle {
-                    vehicle:            object
+                    vehicle:            QGroundControl.multiVehicleManager.vehicles
                     map:                editorMap
-                    coordinate:         object.contaminantCoordinate
-                    subsType:           object.contaminantType
-                    subsConsentration:  object.contaminantConsentration
+                    coordinate:         object.coordinate
+                    alt:                object.coordinate.altitude
+                    subsType:           object.subsType
+                    subsConsentration:  object.subsConsentration
                 }
             }
 
@@ -427,21 +440,6 @@ Rectangle {
                     z:              QGroundControl.zOrderMapItems - 1
                 }
             }
-
-            GeoFenceMapVisuals {
-                map:                    editorMap
-                myGeoFenceController:   _geoFenceController
-                interactive:            _editingLayer == _layerGeoFence
-                homePosition:           _missionController.plannedHomePosition
-                planView:               true
-            }
-
-            RallyPointMapVisuals {
-                map:                    editorMap
-                myRallyPointController: _rallyPointController
-                interactive:            _editingLayer == _layerRallyPoints
-                planView:               true
-            }
            */
 
             ToolStrip {
@@ -468,8 +466,8 @@ Rectangle {
                         iconSource: "/qmlimages/ZoomPlus.svg",
                     },
                     {
-                        name:               "Out",
-                        iconSource:         "/qmlimages/ZoomMinus.svg",
+                        name:       "Out",
+                        iconSource: "/qmlimages/ZoomMinus.svg",
                     }
                 ]
 
@@ -534,327 +532,332 @@ Rectangle {
             text:               qsTr("Radio Active")
         }
 
-        // Right pane for mission editing controls
+        // Right panel for contaminant legend
         Rectangle {
-            id:                 rightPanel
-            anchors.top:        parent.top
+            id:                 legendPanel
+            anchors.bottom:     parent.bottom
             anchors.right:      parent.right
-            height:             260
-            width:              _rightPanelWidth
+            height:             205
+            width:              250
             color:              "white"
             opacity:            0.5
         }
 
-        Rectangle {
-            id:                 recInput
-            anchors.top:        parent.top
-            anchors.topMargin:  10
-            anchors.right:      parent.right
-            width:              _rightPanelWidth
-            color:              qgcPal.window
-
-            Text {
-                id: textConsentration
-                anchors.verticalCenter: tfConsentration.verticalCenter
-                anchors.left: recInput.left
-                width: 108
-                height: 22
-                text: qsTr("Consentration")
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: 12
-            }
-
-            Text {
-                id: textLat
-                anchors.verticalCenter: tfLat.verticalCenter
-                anchors.left: recInput.left
-                width: 108
-                height: 22
-                text: qsTr("Latitude")
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: 12
-            }
-
-            Text {
-                id: textLong
-                anchors.verticalCenter: tfLong.verticalCenter
-                anchors.left: recInput.left
-                width: 108
-                height: 22
-                text: qsTr("Longitude")
-                horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: 12
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            Text {
-                id: textAlt
-                anchors.verticalCenter: tfAlt.verticalCenter
-                anchors.left: recInput.left
-                width: 108
-                height: 22
-                text: qsTr("Altitude")
-                horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: 12
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            TextField {
-                id: tfConsentration
-                anchors.top: rbChemical.bottom
-                anchors.topMargin: 5
-                anchors.left: textConsentration.right
-                width: 126
-                height: 30
-                font.pointSize: 11
-                horizontalAlignment: Text.AlignHCenter
-            }
-
-            TextField {
-                id: tfLat
-                anchors.top: tfConsentration.bottom
-                anchors.topMargin: 5
-                anchors.left: textLat.right
-                width: 126
-                height: 30
-                font.pointSize: 11
-                horizontalAlignment: Text.AlignHCenter
-            }
-
-            TextField {
-                id: tfLong
-                anchors.top: tfLat.bottom
-                anchors.topMargin: 5
-                anchors.left: textLong.right
-                width: 126
-                height: 30
-                horizontalAlignment: Text.AlignHCenter
-                font.pointSize: 11
-            }
-
-            TextField {
-                id: tfAlt
-                anchors.top: tfLong.bottom
-                anchors.topMargin: 5
-                anchors.left: textAlt.right
-                width: 126
-                height: 30
-                horizontalAlignment: Text.AlignHCenter
-                font.pointSize: 11
-            }
-
-            RadioButton {
-                id: rbUAV
-                anchors.top: recInput.top
-                anchors.topMargin: 10
-                anchors.left: recInput.left
-                anchors.leftMargin: 20
-                text: qsTr("UAV")
-                checked: true
-                onClicked: rbUGV.checked = false
-
-            }
-            RadioButton {
-                id: rbUGV
-                anchors.top: recInput.top
-                anchors.topMargin: 10
-                anchors.left: rbUAV.right
-                anchors.leftMargin: 30
-                text: qsTr("UGV")
-                onClicked: rbUAV.checked = false
-            }
-
-            RadioButton {
-                id: rbChemical
-                anchors.top: rbUAV.bottom
-                anchors.topMargin: 10
-                anchors.left: recInput.left
-                anchors.leftMargin: 20
-                text: qsTr("Chemical")
-                checked: true
-                onClicked: rbRadioActive.checked = false
-
-            }
-            RadioButton {
-                id: rbRadioActive
-                anchors.top: rbUGV.bottom
-                anchors.topMargin: 10
-                anchors.left: rbChemical.right
-                anchors.leftMargin: 30
-                text: qsTr("Radio Active")
-                onClicked: rbChemical.checked = false
-            }
-            Button{
-                id: buttonCreate
-                anchors.top: tfAlt.bottom
-                anchors.left: recInput.left
-                anchors.topMargin: 10
-                anchors.leftMargin: 20
-                text: qsTr("Create")
-                onClicked: {
-                    var component = Qt.createComponent("MakeCircleVisualization.qml")
-                    if (component.status === Component.Ready) {
-                        _circleItem = component.createObject(editorMap,
-                                    { "map": editorMap, "_lat": tfLat.text, "_lon": tfLong.text, "_alt": tfAlt.text,
-                                      "_vehicleType": rbUAV.checked ? 0 : 1, "_substanceType": rbChemical ? 0 : 1, "_isCheckedUGVBox": cbUGV.checked,
-                                      "_subsConsentration": tfConsentration.text, "_isCheckedUAVBox": cbUAV.checked })
-                    }
-                }
-            }
+        Text {
+            id: textLegend
+            anchors.topMargin: 5
+            anchors.top:    legendPanel.top
+            anchors.left:   legendPanel.left
+            anchors.right:  legendPanel.right
+            width: 108
+            height: 22
+            text: qsTr("Consentration Legend")
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 23
         }
 
-        /*
-        Item {
-            anchors.fill:   rightPanel
+        Rectangle {
+            id:                 line
+            anchors.left:       legendPanel.left
+            anchors.right:      legendPanel.right
+            anchors.topMargin:  5
+            anchors.top:        textLegend.bottom
+            height:             2
+            color:              "black"
+        }
+
+        Rectangle {
+            id:     safeCircle
+            anchors.topMargin:  10
+            anchors.leftMargin: 20
+            anchors.top:    line.bottom
+            anchors.left:   legendPanel.left
+            width:  20
+            height: width
+            color:  'green'
+            radius: 10
+        }
+
+        Text {
+            id: textSafeCont
+            anchors.verticalCenter: safeCircle.verticalCenter
+            anchors.leftMargin: 20
+            anchors.left: safeCircle.right
+            width: 108
+            height: 22
+            text: qsTr("None of contaminant")
+            verticalAlignment: Text.AlignVCenter
+            font.pixelSize: 18
+        }
+
+        Rectangle {
+            id:     veryLowCircle
+            anchors.topMargin:  10
+            anchors.leftMargin: 20
+            anchors.top: safeCircle.bottom
+            anchors.left: legendPanel.left
+            width:  20
+            height: width
+            color:  "#FFE000"
+            radius: 10
+        }
+
+        Text {
+            id: textVeryLowCont
+            anchors.verticalCenter: veryLowCircle.verticalCenter
+            anchors.leftMargin: 20
+            anchors.left: veryLowCircle.right
+            width: 108
+            height: 22
+            text: qsTr("Very low")
+            verticalAlignment: Text.AlignVCenter
+            font.pixelSize: 18
+        }
+
+        Rectangle {
+            id:     lowCircle
+            anchors.topMargin:  10
+            anchors.leftMargin: 20
+            anchors.top: veryLowCircle.bottom
+            anchors.left: legendPanel.left
+            width:  20
+            height: width
+            color:  "#FFA500"
+            radius: 10
+        }
+
+        Text {
+            id: textLowCont
+            anchors.verticalCenter: lowCircle.verticalCenter
+            anchors.leftMargin: 20
+            anchors.left: lowCircle.right
+            width: 108
+            height: 22
+            text: qsTr("Low")
+            verticalAlignment: Text.AlignVCenter
+            font.pixelSize: 18
+        }
+
+        Rectangle {
+            id:     mediumCircle
+            anchors.topMargin:  10
+            anchors.leftMargin: 20
+            anchors.top: lowCircle.bottom
+            anchors.left: legendPanel.left
+            width:  20
+            height: width
+            color:  "#FF5500"
+            radius: 10
+        }
+
+        Text {
+            id: textMediumCont
+            anchors.verticalCenter: mediumCircle.verticalCenter
+            anchors.leftMargin: 20
+            anchors.left: mediumCircle.right
+            width: 108
+            height: 22
+            text: qsTr("Medium")
+            verticalAlignment: Text.AlignVCenter
+            font.pixelSize: 18
+        }
+
+        Rectangle {
+            id:     highCircle
+            anchors.topMargin:  10
+            anchors.leftMargin: 20
+            anchors.top: mediumCircle.bottom
+            anchors.left: legendPanel.left
+            width:  20
+            height: width
+            color:  "#FF0000"
+            radius: 10
+        }
+
+        Text {
+            id: textHighCont
+            anchors.verticalCenter: highCircle.verticalCenter
+            anchors.leftMargin: 20
+            anchors.left: highCircle.right
+            width: 108
+            height: 22
+            text: qsTr("High")
+            verticalAlignment: Text.AlignVCenter
+            font.pixelSize: 18
+        }
 
 
-            // Plan Element selector (Mission/Fence/Rally)
-            Row {
-                id:                 planElementSelectorRow
-                anchors.topMargin:  Math.round(ScreenTools.defaultFontPixelHeight / 3)
-                anchors.top:        parent.top
-                anchors.left:       parent.left
-                anchors.right:      parent.right
-                spacing:            _horizontalMargin
-                visible:            QGroundControl.corePlugin.options.enablePlanViewSelector
+        // Right pane for mission editing controls
+//        Rectangle {
+//            id:                 rightPanel
+//            anchors.top:        parent.top
+//            anchors.right:      parent.right
+//            height:             260
+//            width:              _rightPanelWidth
+//            color:              "white"
+//            opacity:            0.5
+//        }
 
-                readonly property real _buttonRadius: ScreenTools.defaultFontPixelHeight * 0.75
+//        Rectangle {
+//            id:                 recInput
+//            anchors.top:        parent.top
+//            anchors.topMargin:  10
+//            anchors.right:      parent.right
+//            width:              _rightPanelWidth
+//            color:              qgcPal.window
 
-                ExclusiveGroup {
-                    id: planElementSelectorGroup
-                    onCurrentChanged: {
-                        switch (current) {
-                        case planElementMission:
-                            _editingLayer = _layerMission
-                            break
-                        case planElementGeoFence:
-                            _editingLayer = _layerGeoFence
-                            break
-                        case planElementRallyPoints:
-                            _editingLayer = _layerRallyPoints
-                            break
-                        }
-                    }
-                }
+//            Text {
+//                id: textConsentration
+//                anchors.verticalCenter: tfConsentration.verticalCenter
+//                anchors.left: recInput.left
+//                width: 108
+//                height: 22
+//                text: qsTr("Consentration")
+//                verticalAlignment: Text.AlignVCenter
+//                horizontalAlignment: Text.AlignHCenter
+//                font.pixelSize: 12
+//            }
 
-                QGCRadioButton {
-                    id:             planElementMission
-                    exclusiveGroup: planElementSelectorGroup
-                    text:           qsTr("Mission")
-                    checked:        true
-                    color:          mapPal.text
-                    textStyle:      Text.Outline
-                    textStyleColor: mapPal.textOutline
-                }
+//            Text {
+//                id: textLat
+//                anchors.verticalCenter: tfLat.verticalCenter
+//                anchors.left: recInput.left
+//                width: 108
+//                height: 22
+//                text: qsTr("Latitude")
+//                verticalAlignment: Text.AlignVCenter
+//                horizontalAlignment: Text.AlignHCenter
+//                font.pixelSize: 12
+//            }
 
-                Item { height: 1; width: 1 }
+//            Text {
+//                id: textLong
+//                anchors.verticalCenter: tfLong.verticalCenter
+//                anchors.left: recInput.left
+//                width: 108
+//                height: 22
+//                text: qsTr("Longitude")
+//                horizontalAlignment: Text.AlignHCenter
+//                font.pixelSize: 12
+//                verticalAlignment: Text.AlignVCenter
+//            }
 
-                QGCRadioButton {
-                    id:             planElementGeoFence
-                    exclusiveGroup: planElementSelectorGroup
-                    text:           qsTr("Fence")
-                    color:          mapPal.text
-                    textStyle:      Text.Outline
-                    textStyleColor: mapPal.textOutline
-                }
+//            Text {
+//                id: textAlt
+//                anchors.verticalCenter: tfAlt.verticalCenter
+//                anchors.left: recInput.left
+//                width: 108
+//                height: 22
+//                text: qsTr("Altitude")
+//                horizontalAlignment: Text.AlignHCenter
+//                font.pixelSize: 12
+//                verticalAlignment: Text.AlignVCenter
+//            }
 
-                Item { height: 1; width: 1 }
+//            TextField {
+//                id: tfConsentration
+//                anchors.top: rbChemical.bottom
+//                anchors.topMargin: 5
+//                anchors.left: textConsentration.right
+//                width: 126
+//                height: 30
+//                font.pointSize: 11
+//                horizontalAlignment: Text.AlignHCenter
+//            }
 
-                QGCRadioButton {
-                    id:             planElementRallyPoints
-                    exclusiveGroup: planElementSelectorGroup
-                    text:           qsTr("Rally")
-                    color:          mapPal.text
-                    textStyle:      Text.Outline
-                    textStyleColor: mapPal.textOutline
-                }
-            } // Row - Plan Element Selector
+//            TextField {
+//                id: tfLat
+//                anchors.top: tfConsentration.bottom
+//                anchors.topMargin: 5
+//                anchors.left: textLat.right
+//                width: 126
+//                height: 30
+//                font.pointSize: 11
+//                horizontalAlignment: Text.AlignHCenter
+//            }
 
-            // Mission Item Editor
-            Item {
-                id:                 missionItemEditor
-                anchors.topMargin:  ScreenTools.defaultFontPixelHeight / 2
-                anchors.top:        planElementSelectorRow.visible ? planElementSelectorRow.bottom : planElementSelectorRow.top
-                anchors.left:       parent.left
-                anchors.right:      parent.right
-                anchors.bottom:     parent.bottom
-                visible:            _editingLayer == _layerMission
+//            TextField {
+//                id: tfLong
+//                anchors.top: tfLat.bottom
+//                anchors.topMargin: 5
+//                anchors.left: textLong.right
+//                width: 126
+//                height: 30
+//                horizontalAlignment: Text.AlignHCenter
+//                font.pointSize: 11
+//            }
 
-                QGCListView {
-                    id:             missionItemEditorListView
-                    anchors.fill:   parent
-                    spacing:        _margin / 2
-                    orientation:    ListView.Vertical
-                    model:          _missionController.visualItems
-                    cacheBuffer:    Math.max(height * 2, 0)
-                    clip:           true
-                    currentIndex:   _missionController.currentPlanViewIndex
-                    highlightMoveDuration: 250
+//            TextField {
+//                id: tfAlt
+//                anchors.top: tfLong.bottom
+//                anchors.topMargin: 5
+//                anchors.left: textAlt.right
+//                width: 126
+//                height: 30
+//                horizontalAlignment: Text.AlignHCenter
+//                font.pointSize: 11
+//            }
 
-                    delegate: MissionItemEditor {
-                        map:                editorMap
-                        masterController:  _planMasterController
-                        missionItem:        object
-                        width:              parent.width
-                        readOnly:           false
-                        rootQgcView:        _qgcView
+//            RadioButton {
+//                id: rbUAV
+//                anchors.top: recInput.top
+//                anchors.topMargin: 10
+//                anchors.left: recInput.left
+//                anchors.leftMargin: 20
+//                text: qsTr("UAV")
+//                checked: true
+//                onClicked: rbUGV.checked = false
 
-                        onClicked:  _missionController.setCurrentPlanViewIndex(object.sequenceNumber, false)
+//            }
+//            RadioButton {
+//                id: rbUGV
+//                anchors.top: recInput.top
+//                anchors.topMargin: 10
+//                anchors.left: rbUAV.right
+//                anchors.leftMargin: 30
+//                text: qsTr("UGV")
+//                onClicked: rbUAV.checked = false
+//            }
 
-                        onRemove: {
-                            var removeIndex = index
-                            _missionController.removeMissionItem(removeIndex)
-                            if (removeIndex >= _missionController.visualItems.count) {
-                                removeIndex--
-                            }
-                            _missionController.setCurrentPlanViewIndex(removeIndex, true)
-                        }
+//            RadioButton {
+//                id: rbChemical
+//                anchors.top: rbUAV.bottom
+//                anchors.topMargin: 10
+//                anchors.left: recInput.left
+//                anchors.leftMargin: 20
+//                text: qsTr("Chemical")
+//                checked: true
+//                onClicked: rbRadioActive.checked = false
 
-                        onInsertWaypoint:       insertSimpleMissionItem(editorMap.center, index)
-                        onInsertComplexItem:    insertComplexMissionItem(complexItemName, editorMap.center, index)
-                    }
-                } // QGCListView
-            }  //Item - Mission Item editor
-
-
-            // GeoFence Editor
-            GeoFenceEditor {
-                anchors.topMargin:      ScreenTools.defaultFontPixelHeight / 2
-                anchors.top:            planElementSelectorRow.bottom
-                anchors.left:           parent.left
-                anchors.right:          parent.right
-                availableHeight:        ScreenTools.availableHeight
-                myGeoFenceController:   _geoFenceController
-                flightMap:              editorMap
-                visible:                _editingLayer == _layerGeoFence
-            }
-
-            // Rally Point Editor
-
-            RallyPointEditorHeader {
-                id:                 rallyPointHeader
-                anchors.topMargin:  ScreenTools.defaultFontPixelHeight / 2
-                anchors.top:        planElementSelectorRow.bottom
-                anchors.left:       parent.left
-                anchors.right:      parent.right
-                visible:            _editingLayer == _layerRallyPoints
-                controller:         _rallyPointController
-            }
-
-            RallyPointItemEditor {
-                id:                 rallyPointEditor
-                anchors.topMargin:  ScreenTools.defaultFontPixelHeight / 2
-                anchors.top:        rallyPointHeader.bottom
-                anchors.left:       parent.left
-                anchors.right:      parent.right
-                visible:            _editingLayer == _layerRallyPoints && _rallyPointController.points.count
-                rallyPoint:         _rallyPointController.currentRallyPoint
-                controller:         _rallyPointController
-            }
-        } // Right panel
-      */
+//            }
+//            RadioButton {
+//                id: rbRadioActive
+//                anchors.top: rbUGV.bottom
+//                anchors.topMargin: 10
+//                anchors.left: rbChemical.right
+//                anchors.leftMargin: 30
+//                text: qsTr("Radio Active")
+//                onClicked: rbChemical.checked = false
+//            }
+//            Button{
+//                id: buttonCreate
+//                anchors.top: tfAlt.bottom
+//                anchors.left: recInput.left
+//                anchors.topMargin: 10
+//                anchors.leftMargin: 20
+//                text: qsTr("Create")
+//                onClicked: {
+//                    var component = Qt.createComponent("MakeCircleVisualization.qml")
+//                    if (component.status === Component.Ready) {
+//                        _circleItem = component.createObject(editorMap,
+//                                    { "map": editorMap, "_lat": tfLat.text, "_lon": tfLong.text, "_alt": tfAlt.text,
+//                                      "_vehicleType": rbUAV.checked ? 0 : 1, "_substanceType": rbChemical ? 0 : 1, "_isCheckedUGVBox": cbUGV.checked,
+//                                      "_subsConsentration": tfConsentration.text, "_isCheckedUAVBox": cbUAV.checked })
+//                    }
+//                }
+//            }
+//        }
 
         //Show map scale
         MapScale {
@@ -866,200 +869,5 @@ Rectangle {
             visible:            _toolStripBottom < y
         }
 
-
-        /*
-        MissionItemStatus {
-            id:                 waypointValuesDisplay
-            anchors.margins:    ScreenTools.defaultFontPixelWidth
-            anchors.left:       parent.left
-            height:             ScreenTools.defaultFontPixelHeight
-            maxWidth:           parent.width - rightPanel.width - x
-            anchors.bottom:     parent.bottom
-            missionItems:       _missionController.visualItems
-            visible:            _editingLayer === _layerMission && (_toolStripBottom + mapScale.height) < y && QGroundControl.corePlugin.options.showMissionStatus
-        }
-        */
-
     } // QGCViewPanel
-
-     /*
-    Component {
-        id: syncLoadFromVehicleOverwrite
-        QGCViewMessage {
-            id:         syncLoadFromVehicleCheck
-            message:   qsTr("You have unsaved/unsent changes. Loading from the Vehicle will lose these changes. Are you sure you want to load from the Vehicle?")
-            function accept() {
-                hideDialog()
-                masterController.loadFromVehicle()
-            }
-        }
-    }
-
-
-    Component {
-        id: syncLoadFromFileOverwrite
-        QGCViewMessage {
-            id:         syncLoadFromVehicleCheck
-            message:   qsTr("You have unsaved/unsent changes. Loading from a file will lose these changes. Are you sure you want to load from a file?")
-            function accept() {
-                hideDialog()
-                masterController.loadFromSelectedFile()
-            }
-        }
-    }
-
-
-    Component {
-        id: removeAllPromptDialog
-        QGCViewMessage {
-            message: qsTr("Are you sure you want to remove all items? ") +
-                     (_planMasterController.offline ? "" : qsTr("This will also remove all items from the vehicle."))
-            function accept() {
-                if (_planMasterController.offline) {
-                    masterController.removeAll()
-                } else {
-                    masterController.removeAllFromVehicle()
-                }
-                hideDialog()
-            }
-        }
-    }
-    */
-
-    /*
-    //- ToolStrip DropPanel Components
-
-    Component {
-        id: centerMapDropPanel
-
-        CenterMapDropPanel {
-            map:            editorMap
-            fitFunctions:   mapFitFunctions
-        }
-    }
-
-    Component {
-        id: patternDropPanel
-
-        ColumnLayout {
-            spacing:    ScreenTools.defaultFontPixelWidth * 0.5
-
-            QGCLabel { text: qsTr("Create complex pattern:") }
-
-            Repeater {
-                model: _missionController.complexMissionItemNames
-
-                QGCButton {
-                    text:               modelData
-                    Layout.fillWidth:   true
-
-                    onClicked: {
-                        addComplexItem(modelData)
-                        dropPanel.hide()
-                    }
-                }
-            }
-        } // Column
-    }
-
-    /*
-    Component {
-        id: syncDropPanel
-
-        Column {
-            id:         columnHolder
-            spacing:    _margin
-
-            property string _overwriteText: (_editingLayer == _layerMission) ? qsTr("Mission overwrite") : ((_editingLayer == _layerGeoFence) ? qsTr("GeoFence overwrite") : qsTr("Rally Points overwrite"))
-
-            QGCLabel {
-                width:      sendSaveGrid.width
-                wrapMode:   Text.WordWrap
-                text:       masterController.dirty ?
-                                qsTr("You have unsaved changes. You should upload to your vehicle, or save to a file:") :
-                                qsTr("Sync:")
-            }
-
-            GridLayout {
-                id:                 sendSaveGrid
-                columns:            2
-                anchors.margins:    _margin
-                rowSpacing:         _margin
-                columnSpacing:      ScreenTools.defaultFontPixelWidth
-
-                QGCButton {
-                    text:               qsTr("Upload")
-                    Layout.fillWidth:   true
-                    enabled:            !masterController.offline && !masterController.syncInProgress
-                    onClicked: {
-                        dropPanel.hide()
-                        masterController.upload()
-                    }
-                }
-
-                QGCButton {
-                    text:               qsTr("Download")
-                    Layout.fillWidth:   true
-                    enabled:            !masterController.offline && !masterController.syncInProgress
-                    onClicked: {
-                        dropPanel.hide()
-                        if (masterController.dirty) {
-                            _qgcView.showDialog(syncLoadFromVehicleOverwrite, columnHolder._overwriteText, _qgcView.showDialogDefaultWidth, StandardButton.Yes | StandardButton.Cancel)
-                        } else {
-                            masterController.loadFromVehicle()
-                        }
-                    }
-                }
-
-                QGCButton {
-                    text:               qsTr("Save To File...")
-                    Layout.fillWidth:   true
-                    enabled:            !masterController.syncInProgress
-                    onClicked: {
-                        dropPanel.hide()
-                        masterController.saveToSelectedFile()
-                    }
-                }
-
-                QGCButton {
-                    text:               qsTr("Load From File...")
-                    Layout.fillWidth:   true
-                    enabled:            !masterController.syncInProgress
-                    onClicked: {
-                        dropPanel.hide()
-                        if (masterController.dirty) {
-                            _qgcView.showDialog(syncLoadFromFileOverwrite, columnHolder._overwriteText, _qgcView.showDialogDefaultWidth, StandardButton.Yes | StandardButton.Cancel)
-                        } else {
-                            masterController.loadFromSelectedFile()
-                        }
-                    }
-                }
-
-                QGCButton {
-                    text:               qsTr("Remove All")
-                    Layout.fillWidth:   true
-                    onClicked:  {
-                        dropPanel.hide()
-                        _qgcView.showDialog(removeAllPromptDialog, qsTr("Remove all"), _qgcView.showDialogDefaultWidth, StandardButton.Yes | StandardButton.No)
-                    }
-                }
-
-                QGCButton {
-                    text:               qsTr("Save KML...")
-                    Layout.fillWidth:   true
-                    enabled:            !masterController.syncInProgress
-                    onClicked: {
-                        // First point do not count
-                        if (_visualItems.count < 2) {
-                            _qgcView.showDialog(noItemForKML, qsTr("KML"), _qgcView.showDialogDefaultWidth, StandardButton.Cancel)
-                            return
-                        }
-                        dropPanel.hide()
-                        masterController.saveKmlToSelectedFile()
-                    }
-                }
-            }
-        }
-    }
-    */
 }

@@ -21,6 +21,9 @@
 #include "UASMessageHandler.h"
 #include "SettingsFact.h"
 
+//added
+#include "contaminant.h"
+
 class UAS;
 class UASInterface;
 class FirmwarePlugin;
@@ -355,9 +358,10 @@ public:
     Q_PROPERTY(bool                 highLatencyLink         READ highLatencyLink                                        NOTIFY highLatencyLinkChanged)
 
     //added
-    Q_PROPERTY(QGeoCoordinate       contaminantCoordinate           READ contaminantCoordinate                         )
-    Q_PROPERTY(int                  contaminantType                 READ contaminantType                               )
-    Q_PROPERTY(int                  contaminantConsentration        READ contaminantConsentration                      )
+    Q_PROPERTY(QGeoCoordinate       contaminantCoordinate           READ contaminantCoordinate                         NOTIFY contaminantCoordinateChanged)
+    Q_PROPERTY(int                  contaminantType                 READ contaminantType                               NOTIFY contaminantTypeChanged)
+    Q_PROPERTY(int                  contaminantConsentration        READ contaminantConsentration                      NOTIFY contaminantConsentrationChanged)
+    Q_PROPERTY(QmlObjectListModel*  contaminants                    READ contaminants                                  CONSTANT)
 
     // Vehicle state used for guided control
     Q_PROPERTY(bool flying                  READ flying NOTIFY flyingChanged)                               ///< Vehicle is flying
@@ -492,6 +496,9 @@ public:
     QGeoCoordinate contaminantCoordinate(void) { return _contaminantCoordinate; }
     int contaminantType(void) { return _contaminantType; }
     int contaminantConsentration(void) { return _contaminantConsentration; }
+    QmlObjectListModel* contaminants(void) { return &_contaminants; }
+//    QmlObjectListModel* trajectoryPoints(void) { return &_mapTrajectoryList; }
+
 
     typedef enum {
         JoystickModeRC,         ///< Joystick emulates an RC Transmitter
@@ -766,6 +773,10 @@ public:
     void prepareDelete();
 
 signals:
+    void contaminantCoordinateChanged(QGeoCoordinate contaminantCoordinate);
+    void contaminantTypeChanged(int contaminantType);
+    void contaminantConsentrationChanged(int contaminantConsentration);
+
     void allLinksInactive(Vehicle* vehicle);
     void coordinateChanged(QGeoCoordinate coordinate);
     void joystickModeChanged(int mode);
@@ -1019,7 +1030,8 @@ private:
     QGeoCoordinate  _contaminantCoordinate;
     int             _contaminantType;
     int             _contaminantConsentration;
-
+    QmlObjectListModel  _contaminants;
+//    QmlObjectListModel  _mapTrajectoryList;
 
     QGCCameraManager* _cameras;
 

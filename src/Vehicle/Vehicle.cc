@@ -671,6 +671,7 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
         break;
     case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
         _handleGlobalPositionInt(message);
+//        qDebug() << "Get glob position";
         break;
     case MAVLINK_MSG_ID_ALTITUDE:
         _handleAltitude(message);
@@ -685,8 +686,17 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
         _handleScaledPressure2(message);
         break;
     case MAVLINK_MSG_ID_SCALED_PRESSURE3:
-        _handleScaledPressure3(message);
+//        qDebug() << "Get pressure";
+//        _handleScaledPressure3(message);
+        _handleContaminant(message);
         break;
+
+    //added
+//    case MAVLINK_MSG_ID_CONTAMINANT:
+//        qDebug() << "Get contaminant";
+//        _handleContaminant(message);
+//        break;
+
     case MAVLINK_MSG_ID_CAMERA_IMAGE_CAPTURED:
         _handleCameraImageCaptured(message);
         break;
@@ -695,10 +705,6 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
         break;
     case MAVLINK_MSG_ID_HIGH_LATENCY2:
         _handleHighLatency2(message);
-        break;
-    //added
-    case MAVLINK_MSG_ID_CONTAMINANT:
-        _handleContaminant(message);
         break;
 
     case MAVLINK_MSG_ID_SERIAL_CONTROL:
@@ -718,7 +724,9 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
         _handleWind(message);
         break;
 #endif
+//        default: qDebug() << "Get other";
     }
+
 
     // This must be emitted after the vehicle processes the message. This way the vehicle state is up to date when anyone else
     // does processing.
@@ -811,6 +819,7 @@ void Vehicle::_handleGlobalPositionInt(mavlink_message_t& message)
     _coordinate.setLongitude(globalPositionInt.lon / (double)1E7);
     _coordinate.setAltitude(globalPositionInt.alt  / 1000.0);
     emit coordinateChanged(_coordinate);
+
 }
 
 void Vehicle::_handleHighLatency2(mavlink_message_t& message)
@@ -944,16 +953,19 @@ void Vehicle::_setCapabilities(uint64_t capabilityBits)
 //added
 void Vehicle::_handleContaminant(mavlink_message_t &message)
 {
-    mavlink_contaminant_t contaminant;
-    mavlink_msg_contaminant_decode(&message, &contaminant);
+    mavlink_scaled_pressure3_t contaminant;
+    mavlink_msg_scaled_pressure3_decode(&message, &contaminant);
 
-    _contaminantCoordinate.setLatitude(contaminant.lat  / (double)1E7);
-    _contaminantCoordinate.setLongitude(contaminant.lon / (double)1E7);
-    _contaminantCoordinate.setAltitude(contaminant.alt  / 1000.0);
-    _contaminantType = contaminant.type;
-    _contaminantConsentration = contaminant.msr;
+    Contaminant* newContaminant = new Contaminant();
+    newContaminant->setLatitude(contaminant.press_abs);
+    newContaminant->setLongitude(contaminant.press_diff);
+    newContaminant->setAltitude(contaminant.temperature);
+    newContaminant->setVehicleType(0);
+    newContaminant->setSubsType(contaminant.time_boot_ms % 10);
+    newContaminant->setSubsID(0);
+    newContaminant->setSubsConsentration(contaminant.time_boot_ms / 10);
 
-//    emit coordinateChanged(_coordinate);
+    _contaminants.append(newContaminant);
 }
 
 void Vehicle::_handleAutopilotVersion(LinkInterface *link, mavlink_message_t& message)
@@ -1465,6 +1477,10 @@ void Vehicle::_handleScaledPressure3(mavlink_message_t& message) {
     mavlink_scaled_pressure3_t pressure;
     mavlink_msg_scaled_pressure3_decode(&message, &pressure);
     _temperatureFactGroup.temperature3()->setRawValue(pressure.temperature / 100.0);
+    qDebug() << pressure.time_boot_ms;
+    qDebug() << pressure.press_abs;
+    qDebug() << pressure.press_diff;
+    qDebug() << pressure.temperature;
 }
 
 bool Vehicle::_containsLink(LinkInterface* link)
