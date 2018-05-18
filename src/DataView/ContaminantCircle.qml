@@ -13,9 +13,10 @@ import QGroundControl.Palette       1.0
 MapQuickItem {
     property var    vehicle                                                         /// Vehicle object, undefined for ADSB vehicle
     property var    map
-    visible:        coordinate.isValid
+    property var    visibleCircle
 
-    property int    vehicleType:    0
+    property int    vehicleType
+    property int    subsID
     property int    subsType
     property int    subsConsentration
     property int    lastSubsConsentration
@@ -49,6 +50,7 @@ MapQuickItem {
         id:         vehicleItem
         width:      indicator.width
         height:     indicator.height
+        visible:    visibleCircle
 
         Rectangle {
             id:                     labelControl
@@ -83,15 +85,15 @@ MapQuickItem {
             height:                         width
             color:                          getColor(subsConsentration)
             radius:                         _indicatorRadius
-//            Label {
-//                anchors.fill:           parent
-//                horizontalAlignment:    Text.AlignHCenter
-//                verticalAlignment:      Text.AlignVCenter
-//                color:                  'white'
-//                font.pointSize:         ScreenTools.defaultFontPointSize
-//                fontSizeMode:           Text.HorizontalFit
-//                text:                   _index
-//            }
+            Label {
+                anchors.fill:           parent
+                horizontalAlignment:    Text.AlignHCenter
+                verticalAlignment:      Text.AlignVCenter
+                color:                  'white'
+                font.pointSize:         ScreenTools.defaultFontPointSize
+                fontSizeMode:           Text.HorizontalFit
+                text:                   subsID
+            }
         }
     }
 }

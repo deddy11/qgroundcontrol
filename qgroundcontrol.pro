@@ -394,7 +394,8 @@ HEADERS += \
     src/api/QGCSettings.h \
     src/api/QmlComponentInfo.h \
     src/AnalyzeView/terminal.h \
-    src/DataView/contaminant.h
+    src/DataView/contaminant.h \
+    src/DataView/tablefordata.h
 
 SOURCES += \
     src/api/QGCCorePlugin.cc \
@@ -402,7 +403,8 @@ SOURCES += \
     src/api/QGCSettings.cc \
     src/api/QmlComponentInfo.cc \
     src/AnalyzeView/terminal.cpp \
-    src/DataView/contaminant.cpp
+    src/DataView/contaminant.cpp \
+    src/DataView/tablefordata.cpp
 
 #
 # Unit Test specific configuration goes here (requires full debug build with all plugins)
@@ -1129,4 +1131,4 @@ contains (CONFIG, QGC_DISABLE_BUILD_SETUP) {
 
 include(QGCInstaller.pri)
 
-DISTFILES += \
+DISTFILES +=

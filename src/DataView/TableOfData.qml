@@ -202,7 +202,7 @@ AnalyzePage {
                             }
                         }
                     }
-                }     
+                }
             } // Column - Buttons
         } // RowLayout
     } // Component

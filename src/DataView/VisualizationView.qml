@@ -395,17 +395,37 @@ Rectangle {
 //                }
 //            }
 
+
             //Add Contaminant Circle
             MapItemView {
-                model: QGroundControl.multiVehicleManager.activeVehicle.contaminants
+                model: cbUAV.checked ? QGroundControl.multiVehicleManager.activeVehicle.contaminants : undefined
 
                 delegate: ContaminantCircle {
                     vehicle:            QGroundControl.multiVehicleManager.vehicles
                     map:                editorMap
                     coordinate:         object.coordinate
                     alt:                object.coordinate.altitude
+                    vehicleType:        object.vehicleType
                     subsType:           object.subsType
+                    subsID:             object.subsID
                     subsConsentration:  object.subsConsentration
+                    visibleCircle:      object.vehicleType === 0 ? true : false
+                }
+            }
+
+            MapItemView {
+                model: cbUGV.checked ? QGroundControl.multiVehicleManager.activeVehicle.contaminants : undefined
+
+                delegate: ContaminantCircle {
+                    vehicle:            QGroundControl.multiVehicleManager.vehicles
+                    map:                editorMap
+                    coordinate:         object.coordinate
+                    alt:                object.coordinate.altitude
+                    vehicleType:        object.vehicleType
+                    subsType:           object.subsType
+                    subsID:             object.subsID
+                    subsConsentration:  object.subsConsentration
+                    visibleCircle:      object.vehicleType === 1 ? true : false
                 }
             }
 

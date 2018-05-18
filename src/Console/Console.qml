@@ -298,7 +298,7 @@ Rectangle {
     }
 
 }
-
+//sudo apt-get dist-upgrade
 
 /* code to create tab style
 TabView {

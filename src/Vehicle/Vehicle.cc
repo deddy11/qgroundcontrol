@@ -960,10 +960,15 @@ void Vehicle::_handleContaminant(mavlink_message_t &message)
     newContaminant->setLatitude(contaminant.press_abs);
     newContaminant->setLongitude(contaminant.press_diff);
     newContaminant->setAltitude(contaminant.temperature);
-    newContaminant->setVehicleType(0);
-    newContaminant->setSubsType(contaminant.time_boot_ms % 10);
-    newContaminant->setSubsID(0);
-    newContaminant->setSubsConsentration(contaminant.time_boot_ms / 10);
+//    newContaminant->setVehicleType(0);
+//    newContaminant->setSubsType(contaminant.time_boot_ms % 10);
+//    newContaminant->setSubsID(0);
+//    newContaminant->setSubsConsentration(contaminant.time_boot_ms / 10);
+
+    newContaminant->setSubsConsentration(contaminant.time_boot_ms / 10000);
+    newContaminant->setVehicleType((contaminant.time_boot_ms % 10000) / 1000);
+    newContaminant->setSubsType((contaminant.time_boot_ms % 1000) / 100);
+    newContaminant->setSubsID(contaminant.time_boot_ms % 100);
 
     _contaminants.append(newContaminant);
 }

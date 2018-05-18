@@ -151,7 +151,7 @@ Rectangle {
                 anchors.top:        parent.top
                 anchors.bottom:     parent.bottom
                 exclusiveGroup:     mainActionGroup
-                source:             "/qmlimages/Analyze.svg"
+                source:             "/qmlimages/Search-05.svg"
                 onClicked:          toolBar.showDataView()
             }
             QGCToolBarButton {
@@ -159,7 +159,7 @@ Rectangle {
                 anchors.top:        parent.top
                 anchors.bottom:     parent.bottom
                 exclusiveGroup:     mainActionGroup
-                source:             "/qmlimages/Analyze.svg"
+                source:             "/qmlimages/Terminal-03.svg"
                 onClicked:          toolBar.showConsoleView()
             }//ends here
 
