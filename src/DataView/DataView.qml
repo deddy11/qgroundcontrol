@@ -62,6 +62,7 @@ Rectangle {
             }
 
             QGCLabel {
+                id:                     dataLabel
                 anchors.left:           parent.left
                 anchors.right:          parent.right
                 text:                   qsTr("Data")

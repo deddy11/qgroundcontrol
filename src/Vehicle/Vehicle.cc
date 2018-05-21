@@ -686,17 +686,9 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
         _handleScaledPressure2(message);
         break;
     case MAVLINK_MSG_ID_SCALED_PRESSURE3:
-//        qDebug() << "Get pressure";
 //        _handleScaledPressure3(message);
         _handleContaminant(message);
         break;
-
-    //added
-//    case MAVLINK_MSG_ID_CONTAMINANT:
-//        qDebug() << "Get contaminant";
-//        _handleContaminant(message);
-//        break;
-
     case MAVLINK_MSG_ID_CAMERA_IMAGE_CAPTURED:
         _handleCameraImageCaptured(message);
         break;
@@ -953,24 +945,23 @@ void Vehicle::_setCapabilities(uint64_t capabilityBits)
 //added
 void Vehicle::_handleContaminant(mavlink_message_t &message)
 {
-    mavlink_scaled_pressure3_t contaminant;
-    mavlink_msg_scaled_pressure3_decode(&message, &contaminant);
+//    if (_receiveData) {
+        mavlink_scaled_pressure3_t contaminant;
+        mavlink_msg_scaled_pressure3_decode(&message, &contaminant);
 
-    Contaminant* newContaminant = new Contaminant();
-    newContaminant->setLatitude(contaminant.press_abs);
-    newContaminant->setLongitude(contaminant.press_diff);
-    newContaminant->setAltitude(contaminant.temperature);
-//    newContaminant->setVehicleType(0);
-//    newContaminant->setSubsType(contaminant.time_boot_ms % 10);
-//    newContaminant->setSubsID(0);
-//    newContaminant->setSubsConsentration(contaminant.time_boot_ms / 10);
+        Contaminant* newContaminant = new Contaminant();
+        newContaminant->setLatitude(contaminant.press_abs);
+        newContaminant->setLongitude(contaminant.press_diff);
+        newContaminant->setAltitude(contaminant.temperature);
+        newContaminant->setSubsConsentration(contaminant.time_boot_ms / 10000);
+        newContaminant->setVehicleType((contaminant.time_boot_ms % 10000) / 1000);
+        newContaminant->setSubsType((contaminant.time_boot_ms % 1000) / 100);
+        newContaminant->setSubsID(contaminant.time_boot_ms % 100);
 
-    newContaminant->setSubsConsentration(contaminant.time_boot_ms / 10000);
-    newContaminant->setVehicleType((contaminant.time_boot_ms % 10000) / 1000);
-    newContaminant->setSubsType((contaminant.time_boot_ms % 1000) / 100);
-    newContaminant->setSubsID(contaminant.time_boot_ms % 100);
+        _contaminants.append(newContaminant);
+        emit contaminantsChanged();
+//    }
 
-    _contaminants.append(newContaminant);
 }
 
 void Vehicle::_handleAutopilotVersion(LinkInterface *link, mavlink_message_t& message)

@@ -397,6 +397,7 @@ Rectangle {
 
 
             //Add Contaminant Circle
+            //Show UAV's Data
             MapItemView {
                 model: cbUAV.checked ? QGroundControl.multiVehicleManager.activeVehicle.contaminants : undefined
 
@@ -409,10 +410,11 @@ Rectangle {
                     subsType:           object.subsType
                     subsID:             object.subsID
                     subsConsentration:  object.subsConsentration
-                    visibleCircle:      object.vehicleType === 0 ? true : false
+                    visibleCircle:      object.vehicleType === 1 ? true : false
                 }
             }
 
+            //Show UGV's Data
             MapItemView {
                 model: cbUGV.checked ? QGroundControl.multiVehicleManager.activeVehicle.contaminants : undefined
 
@@ -425,7 +427,7 @@ Rectangle {
                     subsType:           object.subsType
                     subsID:             object.subsID
                     subsConsentration:  object.subsConsentration
-                    visibleCircle:      object.vehicleType === 1 ? true : false
+                    visibleCircle:      object.vehicleType === 2 ? true : false
                 }
             }
 

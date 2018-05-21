@@ -17,68 +17,62 @@ AnalyzePage {
 
     property real _margin:          ScreenTools.defaultFontPixelWidth
     property real _butttonWidth:    ScreenTools.defaultFontPixelWidth * 10
+    property bool _start:           false
 
     QGCPalette { id: palette; colorGroupEnabled: enabled }
 
+//    Vehicle {
+//        id: vehicle
+//    }
+
     Component {
         id: pageComponent
+
+//        ComponenOnComplete : {
+//            vehicle.setReceiveData(false)
+//        }
 
         RowLayout {
             width:  availableWidth
             height: availableHeight
 
-            Connections {
-                target: logController
-                onSelectionChanged: {
-                    tableView.selection.clear()
-                    for(var i = 0; i < logController.model.count; i++) {
-                        var o = logController.model.get(i)
-                        if (o && o.selected) {
-                            tableView.selection.select(i, i)
-                        }
-                    }
-                }
-            }
+//            Connections {
+//                target: logController
+//                onSelectionChanged: {
+//                    tableView.selection.clear()
+//                    for(var i = 0; i < QGroundControl.multiVehicleManager.activeVehicle.contaminants.count; i++) {
+//                        var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(i)
+//                        if (o && o.selected) {
+//                            tableView.selection.select(i, i)
+//                        }
+//                    }
+//                }
+//            }
+
+//            Connections {
+//                target: tableForData
+//                onTableChanged: {
+
+//                }
+//            }
 
             TableView {
                 id: tableView
                 anchors.top:        parent.top
                 anchors.bottom:     parent.bottom
-                model:              logController.model
+                model:              QGroundControl.multiVehicleManager.activeVehicle.contaminants//logController.model
                 selectionMode:      SelectionMode.MultiSelection
                 Layout.fillWidth:   true
-
-                TableViewColumn {
-                    title: qsTr("No")
-                    width: ScreenTools.defaultFontPixelWidth * 6
-                    horizontalAlignment: Text.AlignHCenter
-                    delegate : Text  {
-                        horizontalAlignment: Text.AlignHCenter
-                        text: {
-                            var o = logController.model.get(styleData.row)
-                            return o ? o.id : ""
-                        }
-                    }
-                }
 
                 TableViewColumn {
                     title: qsTr("Vehicle")
                     width: ScreenTools.defaultFontPixelWidth * 34
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
+                        horizontalAlignment: Text.AlignHCenter
                         text: {
-                            var o = logController.model.get(styleData.row)
-                            if (o) {
-                                //-- Have we received this entry already?
-                                if(logController.model.get(styleData.row).received) {
-                                    var d = logController.model.get(styleData.row).time
-                                    if(d.getUTCFullYear() < 2010)
-                                        return qsTr("Date Unknown")
-                                    else
-                                        return d.toLocaleString()
-                                }
-                            }
-                            return ""
+                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(styleData.row)
+                            return o ? o.vehicleType : ""
                         }
                     }
                 }
@@ -88,10 +82,23 @@ AnalyzePage {
                     width: ScreenTools.defaultFontPixelWidth * 18
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
-                        horizontalAlignment: Text.AlignRight
+                        horizontalAlignment: Text.AlignHCenter
                         text: {
-                            var o = logController.model.get(styleData.row)
-                            return o ? o.sizeStr : ""
+                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(styleData.row)
+                            return o ? o.subsType : ""
+                        }
+                    }
+                }
+
+                TableViewColumn {
+                    title: qsTr("Contaminant ID")
+                    width: ScreenTools.defaultFontPixelWidth * 22
+                    horizontalAlignment: Text.AlignHCenter
+                    delegate : Text  {
+                        horizontalAlignment: Text.AlignHCenter
+                        text: {
+                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(styleData.row)
+                            return o ? o.subsID : ""
                         }
                     }
                 }
@@ -103,8 +110,8 @@ AnalyzePage {
                     delegate : Text  {
                         horizontalAlignment: Text.AlignHCenter
                         text: {
-                            var o = logController.model.get(styleData.row)
-                            return o ? o.status : ""
+                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(styleData.row)
+                            return o ? o.subsConsentration : ""
                         }
                     }
                 }
@@ -116,11 +123,12 @@ AnalyzePage {
                     delegate : Text  {
                         horizontalAlignment: Text.AlignHCenter
                         text: {
-                            var o = logController.model.get(styleData.row)
-                            return o ? o.status : ""
+                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(styleData.row)
+                            return o ? (o.coordinate.latitude + ", " + o.coordinate.longitude + ", " + o.coordinate.altitude) : ""
                         }
                     }
                 }
+
             }
 
             Column {
@@ -128,32 +136,41 @@ AnalyzePage {
                 Layout.alignment:   Qt.AlignTop | Qt.AlignLeft
 
                 QGCButton {
-                    enabled:    !logController.requestingList && !logController.downloadingLogs
-                    text:       qsTr("Refresh")
+//                    enabled:    !logController.requestingList && !logController.downloadingLogs
+                    text:       qsTr("Start")
                     width:      _butttonWidth
-
                     onClicked: {
                         if (!QGroundControl.multiVehicleManager.activeVehicle || QGroundControl.multiVehicleManager.activeVehicle.isOfflineEditingVehicle) {
                             tableDataPage.showMessage(qsTr("Log Refresh"), qsTr("You must be connected to a vehicle in order to download logs."), StandardButton.Ok)
                         } else {
-                            logController.refresh()
+//                            logController.refresh()
+//                            vehicle.setReceiveData(true)
                         }
                     }
                 }
 
                 QGCButton {
-                    enabled:    !logController.requestingList && !logController.downloadingLogs && tableView.selection.count > 0
+//                    enabled:    !logController.requestingList && !logController.downloadingLogs
+                    text:       qsTr("Stop")
+                    width:      _butttonWidth
+                    onClicked: {
+//                        vehicle.setReceiveData(false)
+                    }
+                }
+
+                QGCButton {
+//                    enabled:    !logController.requestingList && !logController.downloadingLogs && tableView.selection.count > 0
                     text:       qsTr("Load")
                     width:      _butttonWidth
                     onClicked: {
                         //-- Clear selection
-                        for(var i = 0; i < logController.model.count; i++) {
-                            var o = logController.model.get(i)
+                        for(var i = 0; i < QGroundControl.multiVehicleManager.activeVehicle.contaminants.count; i++) {
+                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(i)
                             if (o) o.selected = false
                         }
                         //-- Flag selected log files
                         tableView.selection.forEach(function(rowIndex){
-                            var o = logController.model.get(rowIndex)
+                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(rowIndex)
                             if (o) o.selected = true
                         })
                         fileDialog.qgcView =        tableDataPage
@@ -177,12 +194,12 @@ AnalyzePage {
                 QGCButton {
                     text:       qsTr("Save")
                     width:      _butttonWidth
-                    enabled:    logController.requestingList || logController.downloadingLogs
+//                    enabled:    logController.requestingList || logController.downloadingLogs
                     onClicked:  logController.cancel()
                 }
 
                 QGCButton {
-                    enabled:    !logController.requestingList && !logController.downloadingLogs && logController.model.count > 0
+//                    enabled:    !logController.requestingList && !logController.downloadingLogs && QGroundControl.multiVehicleManager.activeVehicle.contaminants.count > 0
                     text:       qsTr("Clear All")
                     width:      _butttonWidth
                     onClicked:  tableDataPage.showDialog(eraseAllMessage,

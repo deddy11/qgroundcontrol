@@ -361,7 +361,9 @@ public:
     Q_PROPERTY(QGeoCoordinate       contaminantCoordinate           READ contaminantCoordinate                         NOTIFY contaminantCoordinateChanged)
     Q_PROPERTY(int                  contaminantType                 READ contaminantType                               NOTIFY contaminantTypeChanged)
     Q_PROPERTY(int                  contaminantConsentration        READ contaminantConsentration                      NOTIFY contaminantConsentrationChanged)
-    Q_PROPERTY(QmlObjectListModel*  contaminants                    READ contaminants                                  CONSTANT)
+    Q_PROPERTY(QmlObjectListModel*  contaminants                    READ contaminants                                  NOTIFY contaminantsChanged)
+
+    Q_PROPERTY(bool                 receiveData             READ receiveData            WRITE setReceiveData            NOTIFY receiveDataChanged)
 
     // Vehicle state used for guided control
     Q_PROPERTY(bool flying                  READ flying NOTIFY flyingChanged)                               ///< Vehicle is flying
@@ -497,6 +499,7 @@ public:
     int contaminantType(void) { return _contaminantType; }
     int contaminantConsentration(void) { return _contaminantConsentration; }
     QmlObjectListModel* contaminants(void) { return &_contaminants; }
+    bool receiveData(void) { return _receiveData; }
 //    QmlObjectListModel* trajectoryPoints(void) { return &_mapTrajectoryList; }
 
 
@@ -776,6 +779,9 @@ signals:
     void contaminantCoordinateChanged(QGeoCoordinate contaminantCoordinate);
     void contaminantTypeChanged(int contaminantType);
     void contaminantConsentrationChanged(int contaminantConsentration);
+    void contaminantsChanged();
+
+    void receiveDataChanged();
 
     void allLinksInactive(Vehicle* vehicle);
     void coordinateChanged(QGeoCoordinate coordinate);
@@ -908,6 +914,8 @@ private slots:
     void _updateHobbsMeter(void);
     void _vehicleParamLoaded(bool ready);
 
+    void setReceiveData(bool receiveData_) { _receiveData = receiveData_; }
+
 private:
     bool _containsLink(LinkInterface* link);
     void _addLink(LinkInterface* link);
@@ -1031,6 +1039,8 @@ private:
     int             _contaminantType;
     int             _contaminantConsentration;
     QmlObjectListModel  _contaminants;
+
+    bool            _receiveData;
 //    QmlObjectListModel  _mapTrajectoryList;
 
     QGCCameraManager* _cameras;

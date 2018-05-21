@@ -394,8 +394,7 @@ HEADERS += \
     src/api/QGCSettings.h \
     src/api/QmlComponentInfo.h \
     src/AnalyzeView/terminal.h \
-    src/DataView/contaminant.h \
-    src/DataView/tablefordata.h
+    src/DataView/contaminant.h
 
 SOURCES += \
     src/api/QGCCorePlugin.cc \
@@ -403,8 +402,7 @@ SOURCES += \
     src/api/QGCSettings.cc \
     src/api/QmlComponentInfo.cc \
     src/AnalyzeView/terminal.cpp \
-    src/DataView/contaminant.cpp \
-    src/DataView/tablefordata.cpp
+    src/DataView/contaminant.cpp
 
 #
 # Unit Test specific configuration goes here (requires full debug build with all plugins)

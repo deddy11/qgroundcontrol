@@ -60,7 +60,7 @@ MapQuickItem {
             color:                  'white'
             opacity:                0.5
             radius:                 _labelRadius
-            visible:                (vehicleType == 0) ? true:false
+            visible:                (vehicleType == 1) ? true:false
         }
 
         Label {
