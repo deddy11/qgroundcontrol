@@ -1,12 +1,8 @@
 /****************************************************************************
- *
- *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
- *
- * QGroundControl is licensed according to the terms in the file
- * COPYING.md in the root of the source code directory.
+ * Written by Deddy Welsan
+ * Modified from PlanView.qml
  *
  ****************************************************************************/
-
 
 import QtQuick          2.3
 import QtQuick.Controls 1.2
@@ -27,292 +23,24 @@ import QGroundControl.Controllers   1.0
 
 /// Mission Editor
 
-Rectangle {
-    id:             _summaryRoot
-    anchors.fill:   parent
+QGCView {
+    id:         _qgcView
+    viewPanel:  panel
     anchors.rightMargin: ScreenTools.defaultFontPixelWidth
     anchors.leftMargin:  ScreenTools.defaultFontPixelWidth
     color:          qgcPal.window
 
-    readonly property int   _decimalPlaces:             8
     readonly property real  _horizontalMargin:          ScreenTools.defaultFontPixelWidth  / 2
     readonly property real  _margin:                    ScreenTools.defaultFontPixelHeight * 0.5
     readonly property var   _activeVehicle:             QGroundControl.multiVehicleManager.activeVehicle
     readonly property real  _rightPanelWidth:           Math.min(parent.width / 3, ScreenTools.defaultFontPixelWidth * 30)
-    readonly property real  _toolButtonTopMargin:       parent.height - ScreenTools.availableHeight + (ScreenTools.defaultFontPixelHeight / 2)
-    readonly property var   _defaultVehicleCoordinate:  QtPositioning.coordinate(37.803784, -122.462276)
-    readonly property bool  _waypointsOnlyMode:         QGroundControl.corePlugin.options.missionWaypointsOnly
 
     property var    _planMasterController:      masterController
     property var    _missionController:         _planMasterController.missionController
-    property var    _geoFenceController:        _planMasterController.geoFenceController
-    property var    _rallyPointController:      _planMasterController.rallyPointController
-    property var    _visualItems:               _missionController.visualItems
-    property bool   _lightWidgetBorders:        editorMap.isSatelliteMap
-    property bool   _addWaypointOnClick:        false
-    property bool   _addROIOnClick:             false
-    property bool   _singleComplexItem:         _missionController.complexMissionItemNames.length === 1
     property real   _toolbarHeight:             _qgcView.height - ScreenTools.availableHeight
-    property int    _editingLayer:              _layerMission
-    property int    _toolStripBottom:           toolStrip.height + toolStrip.y
-
-    readonly property int       _layerMission:              1
-    readonly property int       _layerGeoFence:             2
-    readonly property int       _layerRallyPoints:          3
-    readonly property string    _armedVehicleUploadPrompt:  qsTr("Vehicle is currently armed. Do you want to upload the mission to the vehicle?")
 
     property var    _circleItem
 
-//    Component.onCompleted: {
-//        toolbar.planMasterController =  Qt.binding(function () { return _planMasterController })
-//        toolbar.currentMissionItem =    Qt.binding(function () { return _missionController.currentPlanViewItem })
-//    }
-
-    function addComplexItem(complexItemName) {
-        var coordinate = editorMap.center
-        coordinate.latitude = coordinate.latitude.toFixed(_decimalPlaces)
-        coordinate.longitude = coordinate.longitude.toFixed(_decimalPlaces)
-        coordinate.altitude = coordinate.altitude.toFixed(_decimalPlaces)
-        insertComplexMissionItem(complexItemName, coordinate, _missionController.visualItems.count)
-    }
-
-    function insertComplexMissionItem(complexItemName, coordinate, index) {
-        var sequenceNumber = _missionController.insertComplexMissionItem(complexItemName, coordinate, index)
-        _missionController.setCurrentPlanViewIndex(sequenceNumber, true)
-    }
-
-    property bool _firstMissionLoadComplete:    false
-    property bool _firstFenceLoadComplete:      false
-    property bool _firstRallyLoadComplete:      false
-    property bool _firstLoadComplete:           false
-
-    MapFitFunctions {
-        id:                         mapFitFunctions  // The name for this id cannot be changed without breaking references outside of this code. Beware!
-        map:                        editorMap
-        usePlannedHomePosition:     true
-        planMasterController:       _planMasterController
-    }
-
-    Connections {
-        target: QGroundControl.settingsManager.appSettings.defaultMissionItemAltitude
-
-        onRawValueChanged: {
-            if (_visualItems.count > 1) {
-                _qgcView.showDialog(applyNewAltitude, qsTr("Apply new alititude"), showDialogDefaultWidth, StandardButton.Yes | StandardButton.No)
-            }
-        }
-    }
-
-    Component {
-        id: applyNewAltitude
-
-        QGCViewMessage {
-            message:    qsTr("You have changed the default altitude for mission items. Would you like to apply that altitude to all the items in the current mission?")
-
-            function accept() {
-                hideDialog()
-                _missionController.applyDefaultMissionAltitude()
-            }
-        }
-    }
-
-    Component {
-        id: activeMissionUploadDialogComponent
-
-        QGCViewDialog {
-
-            Column {
-                anchors.fill:   parent
-                spacing:        ScreenTools.defaultFontPixelHeight
-
-                QGCLabel {
-                    width:      parent.width
-                    wrapMode:   Text.WordWrap
-                    text:       qsTr("Your vehicle is currently flying a mission. In order to upload a new or modified mission the current mission will be paused.")
-                }
-
-                QGCLabel {
-                    width:      parent.width
-                    wrapMode:   Text.WordWrap
-                    text:       qsTr("After the mission is uploaded you can adjust the current waypoint and start the mission.")
-                }
-
-                QGCButton {
-                    text:       qsTr("Pause and Upload")
-                    onClicked: {
-                        _activeVehicle.flightMode = _activeVehicle.pauseFlightMode
-                        _planMasterController.sendToVehicle()
-                        hideDialog()
-                    }
-                }
-            }
-        }
-    }
-
-    Component {
-        id: noItemForKML
-
-        QGCViewMessage {
-            message:    qsTr("You need at least one item to create a KML.")
-        }
-    }
-
-    PlanMasterController {
-        id: masterController
-
-        Component.onCompleted: {
-            start(true /* editMode */)
-            _missionController.setCurrentPlanViewIndex(0, true)
-        }
-
-        function waitingOnDataMessage() {
-            _qgcView.showMessage(qsTr("Unable to Save/Upload"), qsTr("Plan is waiting on terrain data from server for correct altitude values."), StandardButton.Ok)
-        }
-
-        function upload() {
-            if (!readyForSaveSend()) {
-                waitingOnDataMessage()
-                return
-            }
-            if (_activeVehicle && _activeVehicle.armed && _activeVehicle.flightMode === _activeVehicle.missionFlightMode) {
-                _qgcView.showDialog(activeMissionUploadDialogComponent, qsTr("Plan Upload"), _qgcView.showDialogDefaultWidth, StandardButton.Cancel)
-            } else {
-                sendToVehicle()
-            }
-        }
-
-        function loadFromSelectedFile() {
-            fileDialog.title =          qsTr("Select Plan File")
-            fileDialog.selectExisting = true
-            fileDialog.nameFilters =    masterController.loadNameFilters
-            fileDialog.fileExtension =  QGroundControl.settingsManager.appSettings.planFileExtension
-            fileDialog.fileExtension2 = QGroundControl.settingsManager.appSettings.missionFileExtension
-            fileDialog.openForLoad()
-        }
-
-        function saveToSelectedFile() {
-            if (!readyForSaveSend()) {
-                waitingOnDataMessage()
-                return
-            }
-            fileDialog.title =          qsTr("Save Plan")
-            fileDialog.plan =           true
-            fileDialog.selectExisting = false
-            fileDialog.nameFilters =    masterController.saveNameFilters
-            fileDialog.fileExtension =  QGroundControl.settingsManager.appSettings.planFileExtension
-            fileDialog.fileExtension2 = QGroundControl.settingsManager.appSettings.missionFileExtension
-            fileDialog.openForSave()
-        }
-
-        function fitViewportToItems() {
-            mapFitFunctions.fitMapViewportToMissionItems()
-        }
-
-        function saveKmlToSelectedFile() {
-            if (!readyForSaveSend()) {
-                waitingOnDataMessage()
-                return
-            }
-            fileDialog.title =          qsTr("Save KML")
-            fileDialog.plan =           false
-            fileDialog.selectExisting = false
-            fileDialog.nameFilters =    masterController.saveKmlFilters
-            fileDialog.fileExtension =  QGroundControl.settingsManager.appSettings.kmlFileExtension
-            fileDialog.fileExtension2 = ""
-            fileDialog.openForSave()
-        }
-    }
-
-    Connections {
-        target: _missionController
-
-        onNewItemsFromVehicle: {
-            if (_visualItems && _visualItems.count != 1) {
-                mapFitFunctions.fitMapViewportToMissionItems()
-            }
-            _missionController.setCurrentPlanViewIndex(0, true)
-        }
-    }
-
-    QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
-
-    ExclusiveGroup {
-        id: _mapTypeButtonsExclusiveGroup
-    }
-
-    /// Inserts a new simple mission item
-    ///     @param coordinate Location to insert item
-    ///     @param index Insert item at this index
-    function insertSimpleMissionItem(coordinate, index) {
-        var sequenceNumber = _missionController.insertSimpleMissionItem(coordinate, index)
-        _missionController.setCurrentPlanViewIndex(sequenceNumber, true)
-    }
-
-    /// Inserts a new ROI mission item
-    ///     @param coordinate Location to insert item
-    ///     @param index Insert item at this index
-    function insertROIMissionItem(coordinate, index) {
-        var sequenceNumber = _missionController.insertROIMissionItem(coordinate, index)
-        _missionController.setCurrentPlanViewIndex(sequenceNumber, true)
-        _addROIOnClick = false
-        toolStrip.uncheckAll()
-    }
-
-    property int _moveDialogMissionItemIndex
-
-    QGCFileDialog {
-        id:             fileDialog
-        qgcView:        _qgcView
-        property bool plan: true
-        folder:         QGroundControl.settingsManager.appSettings.missionSavePath
-
-        onAcceptedForSave: {
-            plan ? masterController.saveToFile(file) : masterController.saveToKml(file)
-            close()
-        }
-
-        onAcceptedForLoad: {
-            masterController.loadFromFile(file)
-            masterController.fitViewportToItems()
-            _missionController.setCurrentPlanViewIndex(0, true)
-            close()
-        }
-    }
-
-    Component {
-        id: moveDialog
-
-        QGCViewDialog {
-            function accept() {
-                var toIndex = toCombo.currentIndex
-
-                if (toIndex === 0) {
-                    toIndex = 1
-                }
-                _missionController.moveMissionItem(_moveDialogMissionItemIndex, toIndex)
-                hideDialog()
-            }
-
-            Column {
-                anchors.left:   parent.left
-                anchors.right:  parent.right
-                spacing:        ScreenTools.defaultFontPixelHeight
-
-                QGCLabel {
-                    anchors.left:   parent.left
-                    anchors.right:  parent.right
-                    wrapMode:       Text.WordWrap
-                    text:           qsTr("Move the selected mission item to the be after following mission item:")
-                }
-
-                QGCComboBox {
-                    id:             toCombo
-                    model:          _visualItems.count
-                    currentIndex:   _moveDialogMissionItemIndex
-                }
-            }
-        }
-    }
 
     QGCViewPanel {
         id:             panel
@@ -345,43 +73,6 @@ Rectangle {
             }
 
             QGCMapPalette { id: mapPal; lightColors: editorMap.isSatelliteMap }
-
-            MouseArea {
-                //-- It's a whole lot faster to just fill parent and deal with top offset below
-                //   than computing the coordinate offset.
-                anchors.fill: parent
-                onClicked: {
-                    // Take focus to close any previous editing
-                    editorMap.focus = true
-
-                    //-- Don't pay attention to items beneath the toolbar.
-                    var topLimit = parent.height - ScreenTools.availableHeight
-                    if(mouse.y < topLimit) {
-                        return
-                    }
-
-                    var coordinate = editorMap.toCoordinate(Qt.point(mouse.x, mouse.y), false /* clipToViewPort */)
-                    coordinate.latitude = coordinate.latitude.toFixed(_decimalPlaces)
-                    coordinate.longitude = coordinate.longitude.toFixed(_decimalPlaces)
-                    coordinate.altitude = coordinate.altitude.toFixed(_decimalPlaces)
-
-                    switch (_editingLayer) {
-                    case _layerMission:
-                        if (_addWaypointOnClick) {
-                            insertSimpleMissionItem(coordinate, _missionController.visualItems.count)
-                        } else if (_addROIOnClick) {
-                            _addROIOnClick = false
-                            insertROIMissionItem(coordinate, _missionController.visualItems.count)
-                        }
-                        break
-                    case _layerRallyPoints:
-                        if (_rallyPointController.supported) {
-                            _rallyPointController.addPoint(coordinate)
-                        }
-                        break
-                    }
-                }
-            }
 
 //            MapItemView {
 //                model: QGroundControl.multiVehicleManager.vehicles
@@ -431,39 +122,6 @@ Rectangle {
                 }
             }
 
-            /*
-            // Add the mission item visuals to the map
-            Repeater {
-                model: _editingLayer == _layerMission ? _missionController.visualItems : undefined
-
-                delegate: MissionItemMapVisual {
-                    map:        editorMap
-                    qgcView:    _qgcView
-                    onClicked:  _missionController.setCurrentPlanViewIndex(sequenceNumber, false)
-                    visible:    _editingLayer == _layerMission
-                }
-            }
-            */
-        /*
-            // Add lines between waypoints
-            MissionLineView {
-                model: _editingLayer == _layerMission ? _missionController.waypointLines : undefined
-            }
-
-            // Add the vehicles to the map
-            MapItemView {
-                model: QGroundControl.multiVehicleManager.vehicles
-                delegate:
-                    VehicleMapItem {
-                    vehicle:        object
-                    coordinate:     object.coordinate
-                    map:            editorMap
-                    size:           ScreenTools.defaultFontPixelHeight * 3
-                    z:              QGroundControl.zOrderMapItems - 1
-                }
-            }
-           */
-
             ToolStrip {
                 id:                 toolStrip
                 anchors.leftMargin: ScreenTools.defaultFontPixelWidth
@@ -504,16 +162,18 @@ Rectangle {
                     }
                 }
             }
+
         } // FlightMap
 
+        //panel for contaminant selection
         Rectangle {
             id:                 leftPanel
             anchors.leftMargin: 80
             anchors.left:       parent.left
             anchors.topMargin:  ScreenTools.toolbarHeight + (_margins * 2)
             anchors.top:        parent.top
-            height:             100
-            width:              _rightPanelWidth
+            height:             75
+            width:              210
             color:              "white"
             opacity:            0.5
         }
@@ -709,7 +369,62 @@ Rectangle {
             font.pixelSize: 18
         }
 
+        //Show map scale
+        MapScale {
+            id:                 mapScale
+            anchors.margins:    ScreenTools.defaultFontPixelHeight * (0.66)
+            anchors.bottom:     parent.bottom
+            anchors.left:       parent.left
+            mapControl:         editorMap
+            visible:            _toolStripBottom < y
+        }
 
+        Component {
+            id: contaminantIDDialogComponent
+
+            QGCViewDialog {
+                QGCFlickable {
+                    anchors.fill:   parent
+                    contentHeight:  categoryColumn.height
+                    clip:           true
+
+                    Column {
+                        id:         categoryColumn
+                        spacing:    ScreenTools.defaultFontPixelHeight / 2
+
+                        Repeater {
+                            model: ["01 Nerve", "02 Blist", "03 Blood", "04 Chemical Hazard", "05 Acid",
+                                    "06 Toxic", "07 Cyanogen chloride", "08 Vesicant precursor", "09 Flameable",
+                                    "10 Organic Acid", "12 Chemical Detected", "13 TDI", "14 Acetonitrile",
+                                    "15 Inorganic Acid", "16 VOC", "17 Cyanide", "18 Oxidizer", "19 Air", "20 Choking",
+                                    "21 TIC", "22 TIC Oxidizer", "23 TIC Hydride", "24 TIC Acidic", "25 TIC Organic",
+                                    "26 Chlorine", "27 Ammonia", "28 Hydrogen sulfide", "29 Sulfure dioxide",
+                                    "30 Hydrogen cyanide", "31 Unrecognize Gas"]
+
+                            Label {
+                                text:   modelData
+                                color:  "white"
+                                }
+                            }
+                        }
+                    }
+                } // QGCViewDialog
+            } // Component - contaminantIDDialogComponent
+
+        QGCButton {
+            id:                     contaminantIDButton
+            anchors.top:            parent.top
+            anchors.topMargin:      5
+            anchors.right:          parent.right
+            anchors.rightMargin:    5
+            text:                   qsTr("  Contaminant ID List  ")
+            onClicked:              showDialog(contaminantIDDialogComponent, qsTr("List of contaminant ID"), qgcView.showDialogDefaultWidth, StandardButton.Close)
+        }
+
+    } // QGCViewPanel
+}
+
+/*
         // Right pane for mission editing controls
 //        Rectangle {
 //            id:                 rightPanel
@@ -880,16 +595,4 @@ Rectangle {
 //                }
 //            }
 //        }
-
-        //Show map scale
-        MapScale {
-            id:                 mapScale
-            anchors.margins:    ScreenTools.defaultFontPixelHeight * (0.66)
-            anchors.bottom:     parent.bottom
-            anchors.left:       parent.left
-            mapControl:         editorMap
-            visible:            _toolStripBottom < y
-        }
-
-    } // QGCViewPanel
-}
+*/
