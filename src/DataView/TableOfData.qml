@@ -18,60 +18,33 @@ AnalyzePage {
     property real _margin:          ScreenTools.defaultFontPixelWidth
     property real _butttonWidth:    ScreenTools.defaultFontPixelWidth * 10
     property bool _start:           false
+    property var  _activeVehicle:   QGroundControl.multiVehicleManager.activeVehicle
 
     QGCPalette { id: palette; colorGroupEnabled: enabled }
 
-//    Vehicle {
-//        id: vehicle
-//    }
-
     Component {
         id: pageComponent
-
-//        ComponenOnComplete : {
-//            vehicle.setReceiveData(false)
-//        }
 
         RowLayout {
             width:  availableWidth
             height: availableHeight
 
-//            Connections {
-//                target: logController
-//                onSelectionChanged: {
-//                    tableView.selection.clear()
-//                    for(var i = 0; i < QGroundControl.multiVehicleManager.activeVehicle.contaminants.count; i++) {
-//                        var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(i)
-//                        if (o && o.selected) {
-//                            tableView.selection.select(i, i)
-//                        }
-//                    }
-//                }
-//            }
-
-//            Connections {
-//                target: tableForData
-//                onTableChanged: {
-
-//                }
-//            }
-
             TableView {
                 id: tableView
                 anchors.top:        parent.top
                 anchors.bottom:     parent.bottom
-                model:              QGroundControl.multiVehicleManager.activeVehicle.contaminants//logController.model
+                model:              _activeVehicle.tableData //_activeVehicle.contaminants//logController.model
                 selectionMode:      SelectionMode.MultiSelection
                 Layout.fillWidth:   true
 
                 TableViewColumn {
                     title: qsTr("Vehicle")
-                    width: ScreenTools.defaultFontPixelWidth * 34
+                    width: ScreenTools.defaultFontPixelWidth * 10
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
                         horizontalAlignment: Text.AlignHCenter
                         text: {
-                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(styleData.row)
+                            var o = _activeVehicle.tableData.get(styleData.row) //_activeVehicle.contaminants.get(styleData.row)
                             return o ? o.vehicleType : ""
                         }
                     }
@@ -79,12 +52,12 @@ AnalyzePage {
 
                 TableViewColumn {
                     title: qsTr("Contaminant")
-                    width: ScreenTools.defaultFontPixelWidth * 18
+                    width: ScreenTools.defaultFontPixelWidth * 15
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
                         horizontalAlignment: Text.AlignHCenter
                         text: {
-                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(styleData.row)
+                            var o = _activeVehicle.tableData.get(styleData.row) //_activeVehicle.contaminants.get(styleData.row)
                             return o ? o.subsType : ""
                         }
                     }
@@ -92,12 +65,12 @@ AnalyzePage {
 
                 TableViewColumn {
                     title: qsTr("Contaminant ID")
-                    width: ScreenTools.defaultFontPixelWidth * 22
+                    width: ScreenTools.defaultFontPixelWidth * 15
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
                         horizontalAlignment: Text.AlignHCenter
                         text: {
-                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(styleData.row)
+                            var o = _activeVehicle.tableData.get(styleData.row) //_activeVehicle.contaminants.get(styleData.row)
                             return o ? o.subsID : ""
                         }
                     }
@@ -105,12 +78,12 @@ AnalyzePage {
 
                 TableViewColumn {
                     title: qsTr("Consentration")
-                    width: ScreenTools.defaultFontPixelWidth * 22
+                    width: ScreenTools.defaultFontPixelWidth * 15
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
                         horizontalAlignment: Text.AlignHCenter
                         text: {
-                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(styleData.row)
+                            var o = _activeVehicle.tableData.get(styleData.row) //_activeVehicle.contaminants.get(styleData.row)
                             return o ? o.subsConsentration : ""
                         }
                     }
@@ -118,12 +91,12 @@ AnalyzePage {
 
                 TableViewColumn {
                     title: qsTr("Position")
-                    width: ScreenTools.defaultFontPixelWidth * 22
+                    width: ScreenTools.defaultFontPixelWidth * 50
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
                         horizontalAlignment: Text.AlignHCenter
                         text: {
-                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(styleData.row)
+                            var o = _activeVehicle.tableData.get(styleData.row) //_activeVehicle.contaminants.get(styleData.row)
                             return o ? (o.coordinate.latitude + ", " + o.coordinate.longitude + ", " + o.coordinate.altitude) : ""
                         }
                     }
@@ -137,15 +110,17 @@ AnalyzePage {
 
                 QGCButton {
 //                    enabled:    !logController.requestingList && !logController.downloadingLogs
-                    text:       qsTr("Start")
+                    text:       qsTr("Update")
                     width:      _butttonWidth
                     onClicked: {
-                        if (!QGroundControl.multiVehicleManager.activeVehicle || QGroundControl.multiVehicleManager.activeVehicle.isOfflineEditingVehicle) {
-                            tableDataPage.showMessage(qsTr("Log Refresh"), qsTr("You must be connected to a vehicle in order to download logs."), StandardButton.Ok)
-                        } else {
+                        _activeVehicle._copyData();
+//                        if (!QGroundControl.multiVehicleManager.activeVehicle || QGroundControl.multiVehicleManager.activeVehicle.isOfflineEditingVehicle) {
+//                            tableDataPage.showMessage(qsTr("Log Refresh"), qsTr("You must be connected to a vehicle in order to download logs."), StandardButton.Ok)
+//                        } else {
 //                            logController.refresh()
 //                            vehicle.setReceiveData(true)
-                        }
+
+//                        }
                     }
                 }
 

@@ -358,12 +358,11 @@ public:
     Q_PROPERTY(bool                 highLatencyLink         READ highLatencyLink                                        NOTIFY highLatencyLinkChanged)
 
     //added
-    Q_PROPERTY(QGeoCoordinate       contaminantCoordinate           READ contaminantCoordinate                         NOTIFY contaminantCoordinateChanged)
-    Q_PROPERTY(int                  contaminantType                 READ contaminantType                               NOTIFY contaminantTypeChanged)
-    Q_PROPERTY(int                  contaminantConsentration        READ contaminantConsentration                      NOTIFY contaminantConsentrationChanged)
-    Q_PROPERTY(QmlObjectListModel*  contaminants                    READ contaminants                                  NOTIFY contaminantsChanged)
-
-    Q_PROPERTY(bool                 receiveData             READ receiveData            WRITE setReceiveData            NOTIFY receiveDataChanged)
+//    Q_PROPERTY(QGeoCoordinate       contaminantCoordinate           READ contaminantCoordinate                         NOTIFY contaminantCoordinateChanged)
+//    Q_PROPERTY(int                  contaminantType                 READ contaminantType                               NOTIFY contaminantTypeChanged)
+//    Q_PROPERTY(int                  contaminantConsentration        READ contaminantConsentration                      NOTIFY contaminantConsentrationChanged)
+    Q_PROPERTY(QmlObjectListModel*  contaminants            READ contaminants                               NOTIFY contaminantsChanged)
+    Q_PROPERTY(QmlObjectListModel*  tableData               READ tableData                                  NOTIFY tableDataChanged)
 
     // Vehicle state used for guided control
     Q_PROPERTY(bool flying                  READ flying NOTIFY flyingChanged)                               ///< Vehicle is flying
@@ -495,11 +494,12 @@ public:
     QGeoCoordinate coordinate(void) { return _coordinate; }
 
     //added
-    QGeoCoordinate contaminantCoordinate(void) { return _contaminantCoordinate; }
-    int contaminantType(void) { return _contaminantType; }
-    int contaminantConsentration(void) { return _contaminantConsentration; }
+//    QGeoCoordinate contaminantCoordinate(void) { return _contaminantCoordinate; }
+//    int contaminantType(void) { return _contaminantType; }
+//    int contaminantConsentration(void) { return _contaminantConsentration; }
     QmlObjectListModel* contaminants(void) { return &_contaminants; }
-    bool receiveData(void) { return _receiveData; }
+    QmlObjectListModel* tableData(void) { return &_tableData; }
+
 //    QmlObjectListModel* trajectoryPoints(void) { return &_mapTrajectoryList; }
 
 
@@ -776,12 +776,12 @@ public:
     void prepareDelete();
 
 signals:
-    void contaminantCoordinateChanged(QGeoCoordinate contaminantCoordinate);
-    void contaminantTypeChanged(int contaminantType);
-    void contaminantConsentrationChanged(int contaminantConsentration);
+//    void contaminantCoordinateChanged(QGeoCoordinate contaminantCoordinate);
+//    void contaminantTypeChanged(int contaminantType);
+//    void contaminantConsentrationChanged(int contaminantConsentration);
     void contaminantsChanged();
+    void tableDataChanged();
 
-    void receiveDataChanged();
 
     void allLinksInactive(Vehicle* vehicle);
     void coordinateChanged(QGeoCoordinate coordinate);
@@ -878,6 +878,12 @@ signals:
     // MAVLink protocol version
     void requestProtocolVersion(unsigned version);
 
+public slots:
+    //added
+    void _handleContaminant(mavlink_message_t& message);
+    void _copyData(void);
+    //end
+
 private slots:
     void _mavlinkMessageReceived(LinkInterface* link, mavlink_message_t message);
     void _linkInactiveOrDeleted(LinkInterface* link);
@@ -913,8 +919,6 @@ private slots:
     void _updateDistanceToHome(void);
     void _updateHobbsMeter(void);
     void _vehicleParamLoaded(bool ready);
-
-    void setReceiveData(bool receiveData_) { _receiveData = receiveData_; }
 
 private:
     bool _containsLink(LinkInterface* link);
@@ -969,9 +973,6 @@ private:
     void _startPlanRequest(void);
     void _setupAutoDisarmSignalling(void);
     void _setCapabilities(uint64_t capabilityBits);
-
-    //added
-    void _handleContaminant(mavlink_message_t& message);
 
     int     _id;                    ///< Mavlink system id
     int     _defaultComponentId;
@@ -1035,12 +1036,12 @@ private:
     bool            _highLatencyLink;
 
     //added
-    QGeoCoordinate  _contaminantCoordinate;
-    int             _contaminantType;
-    int             _contaminantConsentration;
+//    QGeoCoordinate  _contaminantCoordinate;
+//    int             _contaminantType;
+//    int             _contaminantConsentration;
     QmlObjectListModel  _contaminants;
+    QmlObjectListModel  _tableData;
 
-    bool            _receiveData;
 //    QmlObjectListModel  _mapTrajectoryList;
 
     QGCCameraManager* _cameras;

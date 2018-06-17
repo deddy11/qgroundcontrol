@@ -945,23 +945,33 @@ void Vehicle::_setCapabilities(uint64_t capabilityBits)
 //added
 void Vehicle::_handleContaminant(mavlink_message_t &message)
 {
-//    if (_receiveData) {
-        mavlink_scaled_pressure3_t contaminant;
-        mavlink_msg_scaled_pressure3_decode(&message, &contaminant);
+    mavlink_scaled_pressure3_t contaminant;
+    mavlink_msg_scaled_pressure3_decode(&message, &contaminant);
 
-        Contaminant* newContaminant = new Contaminant();
-        newContaminant->setLatitude(contaminant.press_abs);
-        newContaminant->setLongitude(contaminant.press_diff);
-        newContaminant->setAltitude(contaminant.temperature);
-        newContaminant->setSubsConsentration(contaminant.time_boot_ms / 10000);
-        newContaminant->setVehicleType((contaminant.time_boot_ms % 10000) / 1000);
-        newContaminant->setSubsType((contaminant.time_boot_ms % 1000) / 100);
-        newContaminant->setSubsID(contaminant.time_boot_ms % 100);
+    Contaminant* newContaminant = new Contaminant();
+    newContaminant->setLatitude(contaminant.press_abs);
+    newContaminant->setLongitude(contaminant.press_diff);
+    newContaminant->setAltitude(contaminant.temperature);
+    newContaminant->setSubsConsentration(contaminant.time_boot_ms / 10000);
+    newContaminant->setVehicleType((contaminant.time_boot_ms % 10000) / 1000);
+    newContaminant->setSubsType((contaminant.time_boot_ms % 1000) / 100);
+    newContaminant->setSubsID(contaminant.time_boot_ms % 100);
 
-        _contaminants.append(newContaminant);
-        emit contaminantsChanged();
-//    }
+    _contaminants.append(newContaminant);
+    emit contaminantsChanged();
+}
 
+void Vehicle::_copyData()
+{
+    int dataCount = _tableData.count();
+    int contaminantCount = _contaminants.count();
+//    Contaminant* newTable = new Contaminant();
+
+    for(int i=dataCount; i<contaminantCount; i++){
+      _tableData.append(_contaminants.get(i));
+    }
+
+    emit tableDataChanged();
 }
 
 void Vehicle::_handleAutopilotVersion(LinkInterface *link, mavlink_message_t& message)
