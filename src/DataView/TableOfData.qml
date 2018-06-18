@@ -113,14 +113,12 @@ AnalyzePage {
                     text:       qsTr("Update")
                     width:      _butttonWidth
                     onClicked: {
-                        _activeVehicle._copyData();
-//                        if (!QGroundControl.multiVehicleManager.activeVehicle || QGroundControl.multiVehicleManager.activeVehicle.isOfflineEditingVehicle) {
-//                            tableDataPage.showMessage(qsTr("Log Refresh"), qsTr("You must be connected to a vehicle in order to download logs."), StandardButton.Ok)
-//                        } else {
-//                            logController.refresh()
-//                            vehicle.setReceiveData(true)
 
-//                        }
+                        if (!QGroundControl.multiVehicleManager.activeVehicle || QGroundControl.multiVehicleManager.activeVehicle.isOfflineEditingVehicle) {
+                            tableDataPage.showMessage(qsTr("Table Update"), qsTr("You must be connected to a vehicle in order to show data of contaminants."), StandardButton.Ok)
+                        } else {
+                            _activeVehicle._copyData();
+                        }
                     }
                 }
 
@@ -177,23 +175,8 @@ AnalyzePage {
 //                    enabled:    !logController.requestingList && !logController.downloadingLogs && QGroundControl.multiVehicleManager.activeVehicle.contaminants.count > 0
                     text:       qsTr("Clear All")
                     width:      _butttonWidth
-                    onClicked:  tableDataPage.showDialog(eraseAllMessage,
-                                                           qsTr("Delete All Log Files"),
-                                                           tableDataPage.showDialogDefaultWidth,
-                                                           StandardButton.Yes | StandardButton.No)
+                    onClicked:  _activeVehicle._clearAll()
 
-                    Component {
-                        id: eraseAllMessage
-
-                        QGCViewMessage {
-                            message:    qsTr("All log files will be erased permanently. Is this really what you want?")
-
-                            function accept() {
-                                tableDataPage.hideDialog()
-                                logController.eraseAll()
-                            }
-                        }
-                    }
                 }
             } // Column - Buttons
         } // RowLayout

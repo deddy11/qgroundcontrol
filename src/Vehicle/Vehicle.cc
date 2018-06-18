@@ -974,6 +974,12 @@ void Vehicle::_copyData()
     emit tableDataChanged();
 }
 
+void Vehicle::_clearAll()
+{
+    _tableData.clearAndDeleteContents();
+    emit tableDataChanged();
+}
+
 void Vehicle::_handleAutopilotVersion(LinkInterface *link, mavlink_message_t& message)
 {
     Q_UNUSED(link);

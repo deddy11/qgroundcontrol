@@ -882,6 +882,7 @@ public slots:
     //added
     void _handleContaminant(mavlink_message_t& message);
     void _copyData(void);
+    void _clearAll(void);
     //end
 
 private slots:

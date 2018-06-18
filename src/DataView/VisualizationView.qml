@@ -30,13 +30,10 @@ QGCView {
     anchors.leftMargin:  ScreenTools.defaultFontPixelWidth
     color:          qgcPal.window
 
-    readonly property real  _horizontalMargin:          ScreenTools.defaultFontPixelWidth  / 2
-    readonly property real  _margin:                    ScreenTools.defaultFontPixelHeight * 0.5
+//    readonly property real  _horizontalMargin:          ScreenTools.defaultFontPixelWidth  / 2
     readonly property var   _activeVehicle:             QGroundControl.multiVehicleManager.activeVehicle
-    readonly property real  _rightPanelWidth:           Math.min(parent.width / 3, ScreenTools.defaultFontPixelWidth * 30)
+//    readonly property real  _rightPanelWidth:           Math.min(parent.width / 3, ScreenTools.defaultFontPixelWidth * 30)
 
-    property var    _planMasterController:      masterController
-    property var    _missionController:         _planMasterController.missionController
     property real   _toolbarHeight:             _qgcView.height - ScreenTools.availableHeight
 
     property var    _circleItem
@@ -55,10 +52,10 @@ QGCView {
             planView:                   true
 
             // This is the center rectangle of the map which is not obscured by tools
-            property rect centerViewport: Qt.rect(_leftToolWidth, _toolbarHeight, editorMap.width - _leftToolWidth - _rightPanelWidth, editorMap.height - _statusHeight - _toolbarHeight)
+//            property rect centerViewport: Qt.rect(_leftToolWidth, _toolbarHeight, editorMap.width - _leftToolWidth - _rightPanelWidth, editorMap.height - _statusHeight - _toolbarHeight)
 
             property real _leftToolWidth:   toolStrip.x + toolStrip.width
-            property real _statusHeight:    waypointValuesDisplay.visible ? editorMap.height - waypointValuesDisplay.y : 0
+//            property real _statusHeight:    waypointValuesDisplay.visible ? editorMap.height - waypointValuesDisplay.y : 0
 
             readonly property real animationDuration: 500
 
@@ -74,23 +71,10 @@ QGCView {
 
             QGCMapPalette { id: mapPal; lightColors: editorMap.isSatelliteMap }
 
-//            MapItemView {
-//                model: QGroundControl.multiVehicleManager.vehicles
-//                delegate:
-//                    VehicleMapItem {
-//                    vehicle:        object
-//                    coordinate:     object.coordinate
-//                    map:            editorMap
-//                    size:           ScreenTools.defaultFontPixelHeight * 3
-//                    z:              QGroundControl.zOrderMapItems - 1
-//                }
-//            }
-
-
             //Add Contaminant Circle
             //Show UAV's Data
             MapItemView {
-                model: cbUAV.checked ? QGroundControl.multiVehicleManager.activeVehicle.contaminants : undefined
+                model: cbUAV.checked ? _activeVehicle.contaminants : undefined
 
                 delegate: ContaminantCircle {
                     vehicle:            QGroundControl.multiVehicleManager.vehicles
@@ -107,7 +91,7 @@ QGCView {
 
             //Show UGV's Data
             MapItemView {
-                model: cbUGV.checked ? QGroundControl.multiVehicleManager.activeVehicle.contaminants : undefined
+                model: cbUGV.checked ? _activeVehicle.contaminants : undefined
 
                 delegate: ContaminantCircle {
                     vehicle:            QGroundControl.multiVehicleManager.vehicles
@@ -126,7 +110,7 @@ QGCView {
                 id:                 toolStrip
                 anchors.leftMargin: ScreenTools.defaultFontPixelWidth
                 anchors.left:       parent.left
-                anchors.topMargin:  ScreenTools.toolbarHeight + (_margins * 2)
+                anchors.topMargin:  5
                 anchors.top:        parent.top
                 color:              qgcPal.window
                 title:              qsTr("Map")
@@ -170,7 +154,7 @@ QGCView {
             id:                 leftPanel
             anchors.leftMargin: 80
             anchors.left:       parent.left
-            anchors.topMargin:  ScreenTools.toolbarHeight + (_margins * 2)
+            anchors.topMargin:  5
             anchors.top:        parent.top
             height:             75
             width:              210
@@ -376,7 +360,7 @@ QGCView {
             anchors.bottom:     parent.bottom
             anchors.left:       parent.left
             mapControl:         editorMap
-            visible:            _toolStripBottom < y
+            visible:            true
         }
 
         Component {
