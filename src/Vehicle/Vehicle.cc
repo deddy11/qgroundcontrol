@@ -6,6 +6,9 @@
  * COPYING.md in the root of the source code directory.
  *
  ****************************************************************************/
+#include <iostream>
+#include <fstream>
+#include <QFile>
 
 #include <QTime>
 #include <QDateTime>
@@ -978,6 +981,35 @@ void Vehicle::_clearAll()
 {
     _tableData.clearAndDeleteContents();
     emit tableDataChanged();
+}
+
+void Vehicle::_downloadData(QString path)
+{
+    using namespace std;
+
+    Contaminant* temp = new Contaminant();
+    QFile file(path);
+    file.open(QFile::WriteOnly | QFile::Text);
+
+    QTextStream out(&file);
+    for(int i=0; i<_tableData.count(); i++) {
+        temp = qobject_cast<Contaminant*>(_tableData.get(i));
+        out << temp->vehicleType() << "," << temp->subsType() << "," << temp->subsID() << "," << temp->subsConsentration() << "," << temp->coordinate().latitude() << "," << temp->coordinate().longitude() << "," << temp->coordinate().altitude() << endl;
+    }
+
+    file.flush();
+    file.close();
+
+//    using namespace std;
+
+//    Contaminant* temp = new Contaminant();
+//    ofstream tableFile;
+//    tableFile.open("/home/uav-rog/Deddy/QGroundProject/LoadFolder/dataOutput.csv");
+
+//    for(int i=0; i<_tableData.count(); i++) {
+//        temp = qobject_cast<Contaminant*>(_tableData.get(i));
+//        tableFile << temp->vehicleType() << "," << temp->subsType() << "," << temp->subsID() << "," << temp->subsConsentration() << "," << temp->coordinate().latitude() << "," << temp->coordinate().longitude() << "," << temp->coordinate().altitude() << endl;
+//    }
 }
 
 void Vehicle::_handleAutopilotVersion(LinkInterface *link, mavlink_message_t& message)

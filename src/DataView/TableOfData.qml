@@ -39,7 +39,7 @@ AnalyzePage {
 
                 TableViewColumn {
                     title: qsTr("Vehicle")
-                    width: ScreenTools.defaultFontPixelWidth * 10
+                    width: ScreenTools.defaultFontPixelWidth * 15
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
                         horizontalAlignment: Text.AlignHCenter
@@ -52,7 +52,7 @@ AnalyzePage {
 
                 TableViewColumn {
                     title: qsTr("Contaminant")
-                    width: ScreenTools.defaultFontPixelWidth * 15
+                    width: ScreenTools.defaultFontPixelWidth * 20
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
                         horizontalAlignment: Text.AlignHCenter
@@ -65,7 +65,7 @@ AnalyzePage {
 
                 TableViewColumn {
                     title: qsTr("Contaminant ID")
-                    width: ScreenTools.defaultFontPixelWidth * 15
+                    width: ScreenTools.defaultFontPixelWidth * 20
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
                         horizontalAlignment: Text.AlignHCenter
@@ -78,7 +78,7 @@ AnalyzePage {
 
                 TableViewColumn {
                     title: qsTr("Consentration")
-                    width: ScreenTools.defaultFontPixelWidth * 15
+                    width: ScreenTools.defaultFontPixelWidth * 20
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
                         horizontalAlignment: Text.AlignHCenter
@@ -91,7 +91,7 @@ AnalyzePage {
 
                 TableViewColumn {
                     title: qsTr("Position")
-                    width: ScreenTools.defaultFontPixelWidth * 50
+                    width: ScreenTools.defaultFontPixelWidth * 70
                     horizontalAlignment: Text.AlignHCenter
                     delegate : Text  {
                         horizontalAlignment: Text.AlignHCenter
@@ -105,6 +105,7 @@ AnalyzePage {
             }
 
             Column {
+                id: column1
                 spacing:            _margin
                 Layout.alignment:   Qt.AlignTop | Qt.AlignLeft
 
@@ -131,36 +132,41 @@ AnalyzePage {
                     }
                 }
 
+                QGCFileDialog {
+                    id:             fileDialog
+                    qgcView:        tableDataPage
+                    folder:         "/home/uav-rog/Deddy/QGroundProject/LoadFolder"
+
+                    onAcceptedForSave: {
+                        _activeVehicle._downloadData(file)
+                        close()
+                    }
+
+                    onAcceptedForLoad: {
+                        logController.download(file)
+                        close()
+                    }
+                }
+
                 QGCButton {
 //                    enabled:    !logController.requestingList && !logController.downloadingLogs && tableView.selection.count > 0
                     text:       qsTr("Load")
                     width:      _butttonWidth
                     onClicked: {
                         //-- Clear selection
-                        for(var i = 0; i < QGroundControl.multiVehicleManager.activeVehicle.contaminants.count; i++) {
-                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(i)
+                        for(var i = 0; i < _activeVehicle.tableData.count; i++) {
+                            var o = _activeVehicle.tableData.get(i)
                             if (o) o.selected = false
                         }
                         //-- Flag selected log files
                         tableView.selection.forEach(function(rowIndex){
-                            var o = QGroundControl.multiVehicleManager.activeVehicle.contaminants.get(rowIndex)
+                            var o = _activeVehicle.tableData.get(rowIndex)
                             if (o) o.selected = true
                         })
-                        fileDialog.qgcView =        tableDataPage
-                        fileDialog.title =          qsTr("Select save directory")
+                        fileDialog.title =          qsTr("Select load directory")
                         fileDialog.selectExisting = true
-                        fileDialog.folder =         QGroundControl.settingsManager.appSettings.telemetrySavePath
                         fileDialog.selectFolder =   true
                         fileDialog.openForLoad()
-                    }
-
-                    QGCFileDialog {
-                        id: fileDialog
-
-                        onAcceptedForLoad: {
-                            logController.download(file)
-                            close()
-                        }
                     }
                 }
 
@@ -168,7 +174,23 @@ AnalyzePage {
                     text:       qsTr("Save")
                     width:      _butttonWidth
 //                    enabled:    logController.requestingList || logController.downloadingLogs
-                    onClicked:  logController.cancel()
+                    onClicked:  //column1.saveKmlToSelectedFile()
+                    {
+                        //-- Clear selection
+                        for(var i = 0; i < _activeVehicle.tableData.count; i++) {
+                            var o = _activeVehicle.tableData.get(i)
+                            if (o) o.selected = false
+                        }
+                        //-- Flag selected log files
+                        tableView.selection.forEach(function(rowIndex){
+                            var o = _activeVehicle.tableData.get(rowIndex)
+                            if (o) o.selected = true
+                        })
+                        fileDialog.title =          qsTr("Save Data")
+                        fileDialog.selectExisting = false
+                        fileDialog.fileExtension = ""
+                        fileDialog.openForSave()
+                    }
                 }
 
                 QGCButton {
