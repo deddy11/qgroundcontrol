@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <QFile>
+#include <string>
 
 #include <QTime>
 #include <QDateTime>
@@ -983,6 +984,12 @@ void Vehicle::_clearAll()
     emit tableDataChanged();
 }
 
+void Vehicle::_clear(int index)
+{
+    QObject* buffer = new QObject;
+    buffer = _tableData.removeAt(index);
+}
+
 void Vehicle::_downloadData(QString path)
 {
     using namespace std;
@@ -999,17 +1006,68 @@ void Vehicle::_downloadData(QString path)
 
     file.flush();
     file.close();
+}
 
-//    using namespace std;
+void Vehicle::_uploadData(QString path)
+{
+    using namespace std;
 
-//    Contaminant* temp = new Contaminant();
-//    ofstream tableFile;
-//    tableFile.open("/home/uav-rog/Deddy/QGroundProject/LoadFolder/dataOutput.csv");
+    QString text;
+    QString vehicleType;
+    QString subsType;
+    QString subsID;
+    QString subsCons;
+    QString latitude;
+    QString longitude;
+    QString altitude;
 
-//    for(int i=0; i<_tableData.count(); i++) {
-//        temp = qobject_cast<Contaminant*>(_tableData.get(i));
-//        tableFile << temp->vehicleType() << "," << temp->subsType() << "," << temp->subsID() << "," << temp->subsConsentration() << "," << temp->coordinate().latitude() << "," << temp->coordinate().longitude() << "," << temp->coordinate().altitude() << endl;
-//    }
+    int i, count;
+    QFile file(path);
+    file.open(QFile::ReadOnly | QFile::Text);
+
+    QTextStream in(&file);
+
+    while(!in.atEnd()){
+        Contaminant* temp = new Contaminant();
+        count = 0;
+        vehicleType.clear();
+        subsType.clear();
+        subsID.clear();
+        subsCons.clear();
+        latitude.clear();
+        longitude.clear();
+        altitude.clear();
+        text.clear();
+
+        text = in.readLine();
+        for(i=0; i<text.length(); i++) {
+            if(text[i] != ',') {
+                switch (count) {
+                    case 0: vehicleType.append(text[i]); break;
+                    case 1: subsType.append(text[i]); break;
+                    case 2: subsID.append(text[i]); break;
+                    case 3: subsCons.append(text[i]); break;
+                    case 4: latitude.append(text[i]); break;
+                    case 5: longitude.append(text[i]); break;
+                    case 6: altitude.append(text[i]); break;
+                }
+            } else {
+                count++;
+            }
+        }
+
+        temp->setVehicleType(vehicleType.toInt());
+        temp->setSubsType(subsType.toInt());
+        temp->setSubsID(subsID.toInt());
+        temp->setSubsConsentration(subsCons.toInt());
+        temp->setLatitude(latitude.toFloat());
+        temp->setLongitude(longitude.toFloat());
+        temp->setAltitude(altitude.toFloat());
+
+        _tableData.append(temp);
+    }
+    emit tableDataChanged();
+    file.close();
 }
 
 void Vehicle::_handleAutopilotVersion(LinkInterface *link, mavlink_message_t& message)

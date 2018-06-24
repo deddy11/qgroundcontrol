@@ -37,6 +37,16 @@ AnalyzePage {
                 selectionMode:      SelectionMode.MultiSelection
                 Layout.fillWidth:   true
 
+//                MouseArea {
+//                    anchors.fill: parent
+//                    onClicked: {
+//                        tableView.currentRow = styleData.row
+//                        tableView.currentColumn = styleData.column
+//                        model.currentIndex = styleData.row
+//                        parent.forceActiveFocus()
+//                    }
+//                }
+
                 TableViewColumn {
                     title: qsTr("Vehicle")
                     width: ScreenTools.defaultFontPixelWidth * 15
@@ -44,7 +54,7 @@ AnalyzePage {
                     delegate : Text  {
                         horizontalAlignment: Text.AlignHCenter
                         text: {
-                            var o = _activeVehicle.tableData.get(styleData.row) //_activeVehicle.contaminants.get(styleData.row)
+                            var o =  _activeVehicle.tableData.get(styleData.row) //_activeVehicle.contaminants.get(styleData.row) //
                             return o ? o.vehicleType : ""
                         }
                     }
@@ -123,14 +133,14 @@ AnalyzePage {
                     }
                 }
 
-                QGCButton {
-//                    enabled:    !logController.requestingList && !logController.downloadingLogs
-                    text:       qsTr("Stop")
-                    width:      _butttonWidth
-                    onClicked: {
-//                        vehicle.setReceiveData(false)
-                    }
-                }
+//                QGCButton {
+////                    enabled:    !logController.requestingList && !logController.downloadingLogs
+//                    text:       qsTr("Stop")
+//                    width:      _butttonWidth
+//                    onClicked: {
+////                        vehicle.setReceiveData(false)
+//                    }
+//                }
 
                 QGCFileDialog {
                     id:             fileDialog
@@ -143,7 +153,7 @@ AnalyzePage {
                     }
 
                     onAcceptedForLoad: {
-                        logController.download(file)
+                        _activeVehicle._uploadData(file)
                         close()
                     }
                 }
@@ -163,9 +173,9 @@ AnalyzePage {
                             var o = _activeVehicle.tableData.get(rowIndex)
                             if (o) o.selected = true
                         })
-                        fileDialog.title =          qsTr("Select load directory")
+                        fileDialog.title =          qsTr("Select Load File")
                         fileDialog.selectExisting = true
-                        fileDialog.selectFolder =   true
+                        fileDialog.fileExtension = ""
                         fileDialog.openForLoad()
                     }
                 }
@@ -193,13 +203,13 @@ AnalyzePage {
                     }
                 }
 
-                QGCButton {
-//                    enabled:    !logController.requestingList && !logController.downloadingLogs && QGroundControl.multiVehicleManager.activeVehicle.contaminants.count > 0
-                    text:       qsTr("Clear All")
-                    width:      _butttonWidth
-                    onClicked:  _activeVehicle._clearAll()
+//                QGCButton {
+////                    enabled:    !logController.requestingList && !logController.downloadingLogs && QGroundControl.multiVehicleManager.activeVehicle.contaminants.count > 0
+//                    text:       qsTr("Clear All")
+//                    width:      _butttonWidth
+//                    onClicked:  _activeVehicle._clearAll(tableView.currentRow)
 
-                }
+//                }
             } // Column - Buttons
         } // RowLayout
     } // Component

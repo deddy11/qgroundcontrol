@@ -883,7 +883,9 @@ public slots:
     void _handleContaminant(mavlink_message_t& message);
     void _copyData(void);
     void _clearAll(void);
+    void _clear(int index);
     void _downloadData(QString path);
+    void _uploadData(QString path);
     //end
 
 private slots:
